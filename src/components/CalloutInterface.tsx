@@ -86,7 +86,10 @@ const CalloutInterface = ({ fighter, onBack, onStartFight }: CalloutInterfacePro
       power: Math.min(100, 60 + statVariation + (boxerData.difficulty === "P4P King" || boxerData.difficulty === "Superstar" ? 20 : 0)),
       speed: Math.min(100, 60 + statVariation + (boxerData.difficulty === "Legend" ? 15 : 0)),
       defense: Math.min(100, 60 + statVariation + (boxerData.difficulty === "Champion" ? 15 : 0)),
-      experience: Math.min(100, 50 + (boxerData.wins * 2))
+      experience: Math.min(100, 50 + (boxerData.wins * 2)),
+      injuries: [],
+      facialDamage: 0,
+      money: 50000
     };
   };
 

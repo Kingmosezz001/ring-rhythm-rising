@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Fighter, FightChoice } from "./BoxingGame";
+import { generateFacialExpression, generateInjury, generateEndFightCommentary } from "./InjurySystem";
 
 interface FightInterfaceProps {
   fighter: Fighter;
@@ -14,6 +15,10 @@ interface FightInterfaceProps {
     opponentScore: number;
     commentary: string[];
     crowdMood: "excited" | "bored" | "hostile" | "electric";
+    playerInjuries: string[];
+    opponentInjuries: string[];
+    playerFacialDamage: number;
+    opponentFacialDamage: number;
   };
   onFightChoice: (choice: FightChoice, result: string) => void;
   onEndFight: (won: boolean) => void;
@@ -23,6 +28,7 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
   const [currentChoices, setCurrentChoices] = useState<FightChoice[]>([]);
   const [lastResult, setLastResult] = useState<string>("");
   const [showResult, setShowResult] = useState(false);
+  const [fightIntensity, setFightIntensity] = useState<"low" | "medium" | "high" | "extreme">("medium");
 
   const generateDynamicChoices = (): FightChoice[] => {
     const baseChoices = [
@@ -131,9 +137,16 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
 
   const generateFightResult = (choice: FightChoice): string => {
     const success = Math.random() < choice.successChance;
+    
+    // Dynamic intensity based on round and action type
+    const roundIntensity = currentFight.round > 8 ? "extreme" : 
+                          currentFight.round > 6 ? "high" : 
+                          currentFight.round > 3 ? "medium" : "low";
+    setFightIntensity(roundIntensity);
+    
     const opponentActions = [
       "throws a vicious counter left hook",
-      "tries to clinch and rough you up inside",
+      "tries to clinch and rough you up inside", 
       "backs away and circles, looking for an opening",
       "digs a hard body shot to your ribs",
       "comes up with a crushing uppercut",
@@ -148,19 +161,24 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
     
     const opponentAction = opponentActions[Math.floor(Math.random() * opponentActions.length)];
     
+    // Generate facial expressions and injuries
+    const playerExpression = generateFacialExpression(success, choice.type, fighter.stamina);
+    const opponentExpression = generateFacialExpression(!success, "defensive", 100 - currentFight.round * 8);
+    const injuryResult = generateInjury(choice, success, roundIntensity);
+    
     if (success) {
       const successResults = {
         aggressive: [
-          `BANG! You land a devastating shot that rocks your opponent to his core! He tries to respond but ${opponentAction} - too little, too late! The crowd is going WILD!`,
-          `What a BOMB! Your power shot finds the target perfectly! Your opponent ${opponentAction} but he's clearly hurt! He's in survival mode now!`,
-          `THUNDEROUS impact! You connect with authority and your opponent's legs wobble! He desperately ${opponentAction} but the damage is done!`,
-          `CRUSHING blow lands flush! Your opponent's mouthpiece flies out as he ${opponentAction} trying to recover! This could be the beginning of the end!`
+          `BANG! You land a devastating shot that rocks your opponent to his core! ${playerExpression} Your opponent ${opponentAction} - too little, too late! ${opponentExpression} The crowd is going WILD! ${injuryResult}`,
+          `What a BOMB! Your power shot finds the target perfectly! ${playerExpression} Your opponent ${opponentAction} but he's clearly hurt! ${opponentExpression} He's in survival mode now! ${injuryResult}`,
+          `THUNDEROUS impact! You connect with authority and your opponent's legs wobble! ${playerExpression} He desperately ${opponentAction} but the damage is done! ${opponentExpression} ${injuryResult}`,
+          `CRUSHING blow lands flush! Your opponent's mouthpiece flies out as he ${opponentAction} trying to recover! ${playerExpression} ${opponentExpression} This could be the beginning of the end! ${injuryResult}`
         ],
         tactical: [
-          `Textbook boxing! You execute the perfect game plan while your opponent ${opponentAction}. Your technique is a thing of beauty!`,
-          `IQ boxing at its finest! You stay two steps ahead as your opponent ${opponentAction} but you've already moved to safety!`,
-          `Beautiful setup! The chess match continues as your opponent ${opponentAction}, but you capitalize with surgical precision!`,
-          `Pure boxing artistry! Your opponent ${opponentAction} but you're controlling distance and timing like a master craftsman!`
+          `Textbook boxing! You execute the perfect game plan while your opponent ${opponentAction}. ${playerExpression} Your technique is a thing of beauty! ${opponentExpression} ${injuryResult}`,
+          `IQ boxing at its finest! You stay two steps ahead as your opponent ${opponentAction} but you've already moved to safety! ${playerExpression} ${opponentExpression} ${injuryResult}`,
+          `Beautiful setup! The chess match continues as your opponent ${opponentAction}, but you capitalize with surgical precision! ${playerExpression} ${opponentExpression} ${injuryResult}`,
+          `Pure boxing artistry! Your opponent ${opponentAction} but you're controlling distance and timing like a master craftsman! ${playerExpression} ${opponentExpression} ${injuryResult}`
         ],
         defensive: [
           `SUPERB defense! Your opponent ${opponentAction} but you make him miss completely and counter with authority! He's hitting nothing but air!`,

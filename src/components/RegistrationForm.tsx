@@ -48,7 +48,10 @@ const RegistrationForm = ({ onCreateFighter }: RegistrationFormProps) => {
       popularity: 10,
       stamina: 100,
       ...stats,
-      experience: 0
+      experience: 0,
+      injuries: [],
+      facialDamage: 0,
+      money: 25000
     };
 
     onCreateFighter(fighter);

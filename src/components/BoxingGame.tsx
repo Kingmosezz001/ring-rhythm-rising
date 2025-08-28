@@ -8,8 +8,9 @@ import RegistrationForm from "./RegistrationForm";
 import FightInterface from "./FightInterface";
 import TrainingInterface from "./TrainingInterface";
 import CalloutInterface from "./CalloutInterface";
+import ScheduleInterface from "./ScheduleInterface";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Sword, Dumbbell, Users, MessageSquare, Trophy, Calendar, Settings, Star } from "lucide-react";
+import { Sword, Dumbbell, Users, MessageSquare, Trophy, Calendar, Settings, Star, Briefcase, Newspaper, TrendingUp, Shield } from "lucide-react";
 
 export interface Fighter {
   name: string;
@@ -24,6 +25,9 @@ export interface Fighter {
   speed: number;
   defense: number;
   experience: number;
+  injuries: string[];
+  facialDamage: number;
+  money: number;
 }
 
 export interface Manager {
@@ -42,7 +46,7 @@ export interface FightChoice {
 
 const BoxingGame = () => {
   const { toast } = useToast();
-  const [gameState, setGameState] = useState<"registration" | "menu" | "career" | "fight" | "training" | "callout">("registration");
+  const [gameState, setGameState] = useState<"registration" | "menu" | "career" | "fight" | "training" | "callout" | "schedule" | "media" | "contracts">("registration");
   const [fighter, setFighter] = useState<Fighter | null>(null);
 
   const [manager] = useState<Manager>({
@@ -62,12 +66,21 @@ const BoxingGame = () => {
     opponentScore: number;
     commentary: string[];
     crowdMood: "excited" | "bored" | "hostile" | "electric";
+    playerInjuries: string[];
+    opponentInjuries: string[];
+    playerFacialDamage: number;
+    opponentFacialDamage: number;
   } | null>(null);
 
   const divisions = ["Lightweight", "Welterweight", "Middleweight", "Light Heavyweight", "Heavyweight"];
 
   const handleCreateFighter = (newFighter: Fighter) => {
-    setFighter(newFighter);
+    setFighter({
+      ...newFighter,
+      injuries: [],
+      facialDamage: 0,
+      money: 25000
+    });
     setGameState("menu");
   };
 
@@ -93,7 +106,10 @@ const BoxingGame = () => {
       popularity: 20 + Math.random() * 60,
       stamina: 100,
       ...baseStats,
-      experience: Math.floor(Math.random() * 50)
+      experience: Math.floor(Math.random() * 50),
+      injuries: [],
+      facialDamage: 0,
+      money: 10000
     };
   };
 
@@ -158,7 +174,11 @@ const BoxingGame = () => {
       playerScore: 0,
       opponentScore: 0,
       commentary: [`Ladies and gentlemen, welcome to tonight's main event! In the red corner, we have ${fighter.name}!`],
-      crowdMood: "excited"
+      crowdMood: "excited",
+      playerInjuries: [],
+      opponentInjuries: [],
+      playerFacialDamage: 0,
+      opponentFacialDamage: 0
     });
     setGameState("fight");
   };
@@ -379,7 +399,35 @@ const BoxingGame = () => {
             playerScore: 0,
             opponentScore: 0,
             commentary: [`Ladies and gentlemen, this is a huge fight! ${fighter.name} has called out ${opponent.name} and the challenge has been accepted!`],
-            crowdMood: "electric"
+            crowdMood: "electric",
+            playerInjuries: [],
+            opponentInjuries: [],
+            playerFacialDamage: 0,
+            opponentFacialDamage: 0
+          });
+          setGameState("fight");
+        }}
+      />
+    );
+  }
+
+  if (gameState === "schedule") {
+    return (
+      <ScheduleInterface
+        fighter={fighter}
+        onBack={() => setGameState("career")}
+        onStartFight={(opponent, purse) => {
+          setCurrentFight({
+            opponent,
+            round: 1,
+            playerScore: 0,
+            opponentScore: 0,
+            commentary: [`Ladies and gentlemen, this is a scheduled bout! ${fighter.name} faces ${opponent.name} for a purse of $${purse.toLocaleString()}!`],
+            crowdMood: "excited",
+            playerInjuries: [],
+            opponentInjuries: [],
+            playerFacialDamage: 0,
+            opponentFacialDamage: 0
           });
           setGameState("fight");
         }}
@@ -456,57 +504,112 @@ const BoxingGame = () => {
           </div>
         </Card>
 
+        {/* Fighter Money & Status */}
+        <Card className="p-4 bg-card border-boxing-red">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-boxing-gold">${fighter.money.toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">Career Earnings</p>
+              </div>
+              {fighter.injuries.length > 0 && (
+                <div className="text-center">
+                  <Badge variant="destructive" className="mb-1">
+                    {fighter.injuries.length} Injuries
+                  </Badge>
+                  <p className="text-xs text-muted-foreground">{fighter.injuries[0]}</p>
+                </div>
+              )}
+              {fighter.facialDamage > 0 && (
+                <div className="text-center">
+                  <Badge variant="secondary" className="mb-1">
+                    Facial Damage
+                  </Badge>
+                  <Progress value={fighter.facialDamage} className="h-2 w-16" />
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+
         {/* Action Buttons */}
         <Card className="p-6 bg-card border-boxing-red">
           <h3 className="text-xl font-bold text-boxing-gold mb-6">Career Actions</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-2">
             <Button 
               onClick={startFight}
-              className="h-20 bg-gradient-danger hover:scale-105 transition-transform flex flex-col gap-1"
+              className="h-16 bg-gradient-danger hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
             >
-              <Sword className="h-6 w-6" />
-              <span className="text-sm font-bold">FIND FIGHT</span>
+              <Sword className="h-4 w-4" />
+              <span className="font-bold">QUICK FIGHT</span>
+            </Button>
+            
+            <Button 
+              onClick={() => setGameState("schedule")}
+              className="h-16 bg-gradient-champion text-boxing-dark hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+            >
+              <Calendar className="h-4 w-4" />
+              <span className="font-bold">SCHEDULE</span>
             </Button>
             
             <Button 
               onClick={() => setGameState("training")}
-              className="h-20 bg-gradient-champion text-boxing-dark hover:scale-105 transition-transform flex flex-col gap-1"
+              className="h-16 bg-secondary hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
             >
-              <Dumbbell className="h-6 w-6" />
-              <span className="text-sm font-bold">TRAINING</span>
+              <Dumbbell className="h-4 w-4" />
+              <span className="font-bold">TRAINING</span>
             </Button>
             
             <Button 
               onClick={() => setGameState("callout")}
-              variant="outline"
-              className="h-20 border-boxing-red text-boxing-red hover:bg-boxing-red/10 flex flex-col gap-1"
+              className="h-16 bg-accent text-accent-foreground hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
             >
-              <Users className="h-6 w-6" />
-              <span className="text-sm font-bold">CALL OUT</span>
+              <MessageSquare className="h-4 w-4" />
+              <span className="font-bold">CALL OUT</span>
+            </Button>
+
+            <Button 
+              onClick={() => setGameState("media")}
+              className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+            >
+              <Newspaper className="h-4 w-4" />
+              <span className="font-bold">MEDIA</span>
             </Button>
             
             <Button 
-              variant="outline"
-              className="h-20 border-boxing-red text-boxing-red hover:bg-boxing-red/10 flex flex-col gap-1"
+              onClick={() => setGameState("contracts")}
+              className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
             >
-              <MessageSquare className="h-6 w-6" />
-              <span className="text-sm font-bold">MANAGER</span>
+              <Briefcase className="h-4 w-4" />
+              <span className="font-bold">CONTRACTS</span>
             </Button>
             
             <Button 
-              variant="outline"
-              className="h-20 border-boxing-red text-boxing-red hover:bg-boxing-red/10 flex flex-col gap-1"
+              className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
             >
-              <Calendar className="h-6 w-6" />
-              <span className="text-sm font-bold">SCHEDULE</span>
+              <Users className="h-4 w-4" />
+              <span className="font-bold">TEAM</span>
             </Button>
             
             <Button 
-              variant="outline"
-              className="h-20 border-boxing-red text-boxing-red hover:bg-boxing-red/10 flex flex-col gap-1"
+              className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
             >
-              <Settings className="h-6 w-6" />
-              <span className="text-sm font-bold">SETTINGS</span>
+              <Trophy className="h-4 w-4" />
+              <span className="font-bold">RANKINGS</span>
+            </Button>
+            
+            <Button 
+              className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+            >
+              <TrendingUp className="h-4 w-4" />
+              <span className="font-bold">STATS</span>
+            </Button>
+            
+            <Button 
+              className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+            >
+              <Settings className="h-4 w-4" />
+              <span className="font-bold">SETTINGS</span>
             </Button>
           </div>
         </Card>
