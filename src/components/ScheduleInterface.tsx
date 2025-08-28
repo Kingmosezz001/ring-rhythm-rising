@@ -241,9 +241,9 @@ const ScheduleInterface = ({ fighter, onBack, onStartFight }: ScheduleInterfaceP
 
   return (
     <div className="min-h-screen bg-gradient-ring p-4">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-4">
         {/* Header */}
-        <Card className="p-6 bg-card border-boxing-red">
+        <Card className="p-4 bg-card border-boxing-red">
           <div className="flex items-center justify-between">
             <Button
               onClick={onBack}
@@ -254,8 +254,8 @@ const ScheduleInterface = ({ fighter, onBack, onStartFight }: ScheduleInterfaceP
               Back to Career
             </Button>
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-boxing-gold">SCHEDULE FIGHT</h1>
-              <p className="text-muted-foreground">Negotiate and schedule your next bout</p>
+              <h1 className="text-2xl font-bold text-boxing-gold">SCHEDULE FIGHT</h1>
+              <p className="text-sm text-muted-foreground">Negotiate and schedule your next bout</p>
             </div>
             <div className="w-24"></div>
           </div>
@@ -263,7 +263,7 @@ const ScheduleInterface = ({ fighter, onBack, onStartFight }: ScheduleInterfaceP
 
         {/* Active Offers */}
         {fightOffers.length > 0 && (
-          <Card className="p-6 bg-card border-boxing-red">
+          <Card className="p-4 bg-card border-boxing-red">
             <h3 className="text-xl font-bold text-boxing-gold mb-4">Active Fight Offers</h3>
             <div className="space-y-4">
               {fightOffers.map((offer, index) => (
@@ -319,7 +319,7 @@ const ScheduleInterface = ({ fighter, onBack, onStartFight }: ScheduleInterfaceP
         )}
 
         {/* Available Opponents */}
-        <Card className="p-6 bg-card border-boxing-red">
+        <Card className="p-4 bg-card border-boxing-red">
           <h3 className="text-xl font-bold text-boxing-gold mb-4">Available Opponents</h3>
           <div className="grid gap-4">
             {availableOpponents.map((opponent) => {
@@ -327,7 +327,7 @@ const ScheduleInterface = ({ fighter, onBack, onStartFight }: ScheduleInterfaceP
               const estimatedPurse = generateFightOffer(opponent).purse;
               
               return (
-                <div key={opponent.name} className="bg-muted p-6 rounded-lg">
+                <div key={opponent.name} className="bg-muted p-4 rounded-lg">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
                       <h4 className="text-xl font-bold text-boxing-gold">{opponent.name}</h4>

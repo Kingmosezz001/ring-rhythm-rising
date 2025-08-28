@@ -9,6 +9,8 @@ import FightInterface from "./FightInterface";
 import TrainingInterface from "./TrainingInterface";
 import CalloutInterface from "./CalloutInterface";
 import ScheduleInterface from "./ScheduleInterface";
+import MediaInterface from "./MediaInterface";
+import SettingsInterface from "./SettingsInterface";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Sword, Dumbbell, Users, MessageSquare, Trophy, Calendar, Settings, Star, Briefcase, Newspaper, TrendingUp, Shield } from "lucide-react";
 
@@ -46,7 +48,7 @@ export interface FightChoice {
 
 const BoxingGame = () => {
   const { toast } = useToast();
-  const [gameState, setGameState] = useState<"registration" | "menu" | "career" | "fight" | "training" | "callout" | "schedule" | "media" | "contracts">("registration");
+  const [gameState, setGameState] = useState<"registration" | "menu" | "career" | "fight" | "training" | "callout" | "schedule" | "media" | "contracts" | "settings">("registration");
   const [fighter, setFighter] = useState<Fighter | null>(null);
 
   const [manager] = useState<Manager>({
@@ -435,6 +437,32 @@ const BoxingGame = () => {
     );
   }
 
+  if (gameState === "media") {
+    return (
+      <MediaInterface
+        fighter={fighter}
+        onBack={() => setGameState("career")}
+      />
+    );
+  }
+
+  if (gameState === "settings") {
+    return (
+      <SettingsInterface
+        fighter={fighter}
+        onBack={() => setGameState("career")}
+        onNextWeek={() => {
+          // Add week advancement logic here
+          setGameState("career");
+        }}
+        onReset={() => {
+          setFighter(null);
+          setGameState("registration");
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-ring p-4">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -606,6 +634,7 @@ const BoxingGame = () => {
             </Button>
             
             <Button 
+              onClick={() => setGameState("settings")}
               className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
             >
               <Settings className="h-4 w-4" />
