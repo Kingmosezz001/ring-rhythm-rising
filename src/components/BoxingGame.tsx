@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import RegistrationForm from "./RegistrationForm";
 import FightInterface from "./FightInterface";
 import TrainingInterface from "./TrainingInterface";
+import CalloutInterface from "./CalloutInterface";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Sword, Dumbbell, Users, MessageSquare, Trophy, Calendar, Settings, Star } from "lucide-react";
 
@@ -41,7 +42,7 @@ export interface FightChoice {
 
 const BoxingGame = () => {
   const { toast } = useToast();
-  const [gameState, setGameState] = useState<"registration" | "menu" | "career" | "fight" | "training">("registration");
+  const [gameState, setGameState] = useState<"registration" | "menu" | "career" | "fight" | "training" | "callout">("registration");
   const [fighter, setFighter] = useState<Fighter | null>(null);
 
   const [manager] = useState<Manager>({
@@ -198,31 +199,60 @@ const BoxingGame = () => {
     });
   };
 
+  const generateEndFightCommentary = (won: boolean, opponent: Fighter): string => {
+    if (won) {
+      const winCommentary = [
+        `What a performance! ${fighter.name} dominated tonight with a masterful display of boxing! This young fighter is going places!`,
+        `Spectacular victory for ${fighter.name}! The way he controlled the distance and timing was poetry in motion! Star quality on display!`,
+        `${fighter.name} has announced himself to the division tonight! That was a statement win that will have everyone talking!`,
+        `Incredible heart and skill from ${fighter.name}! He weathered the storm and came back to win convincingly! Championship material!`,
+        `What we witnessed tonight was special! ${fighter.name} showed the complete package - skill, power, and ring IQ! The future is bright!`
+      ];
+      return winCommentary[Math.floor(Math.random() * winCommentary.length)];
+    } else {
+      const lossCommentary = [
+        `Tough night for ${fighter.name}, but this is all part of the learning process. He showed heart and will be back stronger!`,
+        `${fighter.name} came up short tonight, but he never stopped trying! That's the mark of a true fighter - you learn more from losses than wins!`,
+        `Not the result ${fighter.name} wanted, but he gained valuable experience tonight! This setback will only make him hungrier!`,
+        `${fighter.name} fought valiantly but ${opponent.name} was just too much tonight! Sometimes you have to take a step back to move forward!`,
+        `Credit to ${fighter.name} for taking this tough fight! He may have lost tonight, but his stock didn't drop in my eyes!`
+      ];
+      return lossCommentary[Math.floor(Math.random() * lossCommentary.length)];
+    }
+  };
+
   const endFight = (won: boolean) => {
-    if (!fighter) return;
+    if (!fighter || !currentFight) return;
+    
+    const endCommentary = generateEndFightCommentary(won, currentFight.opponent);
     
     if (won) {
+      const experienceGain = Math.max(5, 10 - Math.floor(fighter.wins / 5)); // Diminishing experience
+      const popularityGain = Math.max(2, 8 - Math.floor(fighter.popularity / 20));
+      
       setFighter(prev => prev ? ({
         ...prev,
         wins: prev.wins + 1,
-        experience: prev.experience + 10,
-        popularity: Math.min(100, prev.popularity + 5),
+        experience: prev.experience + experienceGain,
+        popularity: Math.min(100, prev.popularity + popularityGain),
         stamina: 100
       }) : null);
+      
       toast({
-        title: "Victory!",
-        description: "You won the fight! Your reputation grows.",
+        title: "VICTORY!",
+        description: endCommentary,
       });
     } else {
       setFighter(prev => prev ? ({
         ...prev,
         losses: prev.losses + 1,
-        experience: prev.experience + 3,
+        experience: prev.experience + 2, // Less experience from losses
         stamina: 100
       }) : null);
+      
       toast({
-        title: "Defeat",
-        description: "You lost this one, but you learned from it.",
+        title: "DEFEAT",
+        description: endCommentary,
         variant: "destructive"
       });
     }
@@ -233,7 +263,16 @@ const BoxingGame = () => {
   const trainStat = (stat: string) => {
     if (!fighter) return;
     
-    const improvement = 2 + Math.floor(Math.random() * 4); // 2-5 points
+    // Much slower progression - 1-3 points with diminishing returns
+    const baseImprovement = 1 + Math.floor(Math.random() * 3);
+    const currentStat = stat === "power" ? fighter.power : 
+                       stat === "speed" ? fighter.speed :
+                       stat === "defense" ? fighter.defense :
+                       stat === "stamina" ? fighter.stamina : 50;
+    
+    // Diminishing returns - harder to improve when stats are high
+    const difficultyModifier = currentStat > 80 ? 0.5 : currentStat > 60 ? 0.75 : 1;
+    const improvement = Math.max(1, Math.floor(baseImprovement * difficultyModifier));
     
     setFighter(prev => {
       if (!prev) return null;
@@ -328,6 +367,26 @@ const BoxingGame = () => {
     );
   }
 
+  if (gameState === "callout") {
+    return (
+      <CalloutInterface
+        fighter={fighter}
+        onBack={() => setGameState("career")}
+        onStartFight={(opponent) => {
+          setCurrentFight({
+            opponent,
+            round: 1,
+            playerScore: 0,
+            opponentScore: 0,
+            commentary: [`Ladies and gentlemen, this is a huge fight! ${fighter.name} has called out ${opponent.name} and the challenge has been accepted!`],
+            crowdMood: "electric"
+          });
+          setGameState("fight");
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-ring p-4">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -418,6 +477,7 @@ const BoxingGame = () => {
             </Button>
             
             <Button 
+              onClick={() => setGameState("callout")}
               variant="outline"
               className="h-20 border-boxing-red text-boxing-red hover:bg-boxing-red/10 flex flex-col gap-1"
             >

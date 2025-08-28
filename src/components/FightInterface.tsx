@@ -132,12 +132,18 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
   const generateFightResult = (choice: FightChoice): string => {
     const success = Math.random() < choice.successChance;
     const opponentActions = [
-      "throws a counter left hook",
-      "tries to clinch you",
-      "backs away and circles",
-      "goes for a body shot",
-      "attempts an uppercut",
-      "feints and moves laterally"
+      "throws a vicious counter left hook",
+      "tries to clinch and rough you up inside",
+      "backs away and circles, looking for an opening",
+      "digs a hard body shot to your ribs",
+      "comes up with a crushing uppercut",
+      "feints and moves laterally, setting traps",
+      "unleashes a brutal combination",
+      "steps in with a devastating right cross",
+      "works the body with punishing shots",
+      "ties you up and leans on you heavily",
+      "pivots and throws a sneaky left hook",
+      "pressures forward with bad intentions"
     ];
     
     const opponentAction = opponentActions[Math.floor(Math.random() * opponentActions.length)];
@@ -145,48 +151,56 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
     if (success) {
       const successResults = {
         aggressive: [
-          `You land a devastating shot! Your opponent staggers back as ${opponentAction}. The crowd erupts!`,
-          `Perfect timing! You connect cleanly while your opponent ${opponentAction} but misses!`,
-          `Boom! Your power shot finds its mark as your opponent ${opponentAction} too late!`
+          `BANG! You land a devastating shot that rocks your opponent to his core! He tries to respond but ${opponentAction} - too little, too late! The crowd is going WILD!`,
+          `What a BOMB! Your power shot finds the target perfectly! Your opponent ${opponentAction} but he's clearly hurt! He's in survival mode now!`,
+          `THUNDEROUS impact! You connect with authority and your opponent's legs wobble! He desperately ${opponentAction} but the damage is done!`,
+          `CRUSHING blow lands flush! Your opponent's mouthpiece flies out as he ${opponentAction} trying to recover! This could be the beginning of the end!`
         ],
         tactical: [
-          `Smart boxing! You execute perfectly while your opponent ${opponentAction}. Clean technique!`,
-          `Textbook move! Your opponent ${opponentAction} but you're already out of range!`,
-          `Beautiful setup! As your opponent ${opponentAction}, you capitalize with precision!`
+          `Textbook boxing! You execute the perfect game plan while your opponent ${opponentAction}. Your technique is a thing of beauty!`,
+          `IQ boxing at its finest! You stay two steps ahead as your opponent ${opponentAction} but you've already moved to safety!`,
+          `Beautiful setup! The chess match continues as your opponent ${opponentAction}, but you capitalize with surgical precision!`,
+          `Pure boxing artistry! Your opponent ${opponentAction} but you're controlling distance and timing like a master craftsman!`
         ],
         defensive: [
-          `Great defense! Your opponent ${opponentAction} but you slip it beautifully and counter!`,
-          `Perfect timing! You avoid the attack as your opponent ${opponentAction} and land your own!`,
-          `Excellent defense! Your opponent ${opponentAction} but hits nothing but air!`
+          `SUPERB defense! Your opponent ${opponentAction} but you make him miss completely and counter with authority! He's hitting nothing but air!`,
+          `Defensive masterclass! Your opponent ${opponentAction} with bad intentions but you slip it like a ghost and land your own shot!`,
+          `Elusive as smoke! Your opponent ${opponentAction} desperately but you're gone and back with interest! He can't touch you!`,
+          `Matrix-like movement! Your opponent ${opponentAction} but you see it coming from a mile away and punish him for it!`
         ],
         risky: [
-          `INCREDIBLE! Your high-risk move pays off huge as your opponent ${opponentAction} right into it!`,
-          `What a gamble! Your opponent ${opponentAction} but you connect with a spectacular shot!`,
-          `Unbelievable! Your opponent ${opponentAction} but your risky attack lands perfectly!`
+          `HOLY SMOKES! Your all-or-nothing gamble pays off HUGE! Your opponent ${opponentAction} right into your trap! The arena has ERUPTED!`,
+          `UNBELIEVABLE! High risk, massive reward! Your opponent ${opponentAction} but walks straight into your haymaker! This place is going CRAZY!`,
+          `WHAT A MOMENT! Your desperate attempt lands perfectly as your opponent ${opponentAction}! Sometimes you gotta risk it all!`,
+          `SPECTACULAR! Your opponent ${opponentAction} but your wild swing finds the sweet spot! Fortune favors the bold!`
         ]
       };
       return successResults[choice.type][Math.floor(Math.random() * successResults[choice.type].length)];
     } else {
       const failureResults = {
         aggressive: [
-          `You swing hard but miss! Your opponent ${opponentAction} and connects! You're off balance!`,
-          `Too aggressive! Your opponent ${opponentAction} and catches you coming in!`,
-          `Your power shot misses the mark! Your opponent ${opponentAction} and punishes your mistake!`
+          `WHIFF! Your haymaker finds nothing but air! Your opponent sees it coming and ${opponentAction} landing flush! You're in trouble now!`,
+          `TOO WILD! Your aggressive attack leaves you wide open and your opponent ${opponentAction} punishing your recklessness! That's gonna cost you!`,
+          `MISSED OPPORTUNITY! Your power shot goes nowhere and your opponent ${opponentAction} making you pay dearly! He's taking control!`,
+          `OVERCOMMITTED! You throw everything behind that shot but miss completely! Your opponent ${opponentAction} and now you're on the back foot!`
         ],
         tactical: [
-          `Your opponent reads your move! As you set up, they ${opponentAction} and disrupt your plan!`,
-          `Good idea but poor execution! Your opponent ${opponentAction} and beats you to the punch!`,
-          `Your opponent anticipated that! They ${opponentAction} and counter your technique!`
+          `OUTSMARTED! Your opponent reads you like a book and ${opponentAction} disrupting your entire game plan! He's one step ahead!`,
+          `COUNTERED! Your technical approach gets shut down as your opponent ${opponentAction} and beats you to the punch! He saw that coming!`,
+          `NEUTRALIZED! Your opponent has your number and ${opponentAction} turning your own plan against you! You need to switch it up!`,
+          `PREDICTED! Your opponent anticipated that perfectly and ${opponentAction} making your technique look amateur! He's in your head!`
         ],
         defensive: [
-          `Too passive! Your opponent ${opponentAction} and finds an opening! You need more offense!`,
-          `Your defense breaks down! Your opponent ${opponentAction} and gets through your guard!`,
-          `Playing it safe backfires! Your opponent ${opponentAction} and takes control!`
+          `TOO PASSIVE! Your shell defense crumbles as your opponent ${opponentAction} finding the gaps! You can't win rounds like this!`,
+          `BREAKTHROUGH! Your defense finally breaks down and your opponent ${opponentAction} getting through clean! The tide is turning!`,
+          `NOT ENOUGH! Your safety-first approach backfires as your opponent ${opponentAction} taking over the fight! You need to take risks!`,
+          `OVERWHELMED! Your opponent ${opponentAction} with relentless pressure and your defense can't hold! He's breaking you down!`
         ],
         risky: [
-          `Costly mistake! Your opponent ${opponentAction} and makes you pay for the wild attempt!`,
-          `High risk, no reward! Your opponent ${opponentAction} and capitalizes on your opening!`,
-          `The gamble fails! Your opponent ${opponentAction} and punishes your recklessness!`
+          `CATASTROPHIC! Your wild gamble leaves you completely exposed and your opponent ${opponentAction} making you pay the ultimate price!`,
+          `DISASTER! Your desperation move fails spectacularly as your opponent ${opponentAction} capitalizing on your mistake! This could be over!`,
+          `BACKFIRES! Your all-or-nothing attempt goes horribly wrong and your opponent ${opponentAction} putting you in serious danger!`,
+          `PUNISHED! Your reckless abandon costs you dearly as your opponent ${opponentAction} and now you're fighting for survival!`
         ]
       };
       return failureResults[choice.type][Math.floor(Math.random() * failureResults[choice.type].length)];

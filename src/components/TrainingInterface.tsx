@@ -123,7 +123,7 @@ const TrainingInterface = ({ fighter, onTrainStat, onBack }: TrainingInterfacePr
                           onTrainStat(option.id);
                         }}
                       >
-                        Train (+2-5 points)
+                        Train (+1-3 points)
                       </Button>
                     )}
                   </div>
