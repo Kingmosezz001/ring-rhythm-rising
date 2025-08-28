@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import RegistrationForm from "./RegistrationForm";
+import FightInterface from "./FightInterface";
 
 export interface Fighter {
   name: string;
@@ -36,21 +38,8 @@ export interface FightChoice {
 
 const BoxingGame = () => {
   const { toast } = useToast();
-  const [gameState, setGameState] = useState<"menu" | "career" | "fight" | "training">("menu");
-  const [fighter, setFighter] = useState<Fighter>({
-    name: "Rookie Fighter",
-    age: 18,
-    division: "Lightweight",
-    wins: 0,
-    losses: 0,
-    ko: 0,
-    popularity: 10,
-    stamina: 100,
-    power: 65,
-    speed: 70,
-    defense: 60,
-    experience: 0
-  });
+  const [gameState, setGameState] = useState<"registration" | "menu" | "career" | "fight" | "training">("registration");
+  const [fighter, setFighter] = useState<Fighter | null>(null);
 
   const [manager] = useState<Manager>({
     name: "Tony Martinez",
@@ -73,7 +62,14 @@ const BoxingGame = () => {
 
   const divisions = ["Lightweight", "Welterweight", "Middleweight", "Light Heavyweight", "Heavyweight"];
 
+  const handleCreateFighter = (newFighter: Fighter) => {
+    setFighter(newFighter);
+    setGameState("menu");
+  };
+
   const generateOpponent = (): Fighter => {
+    if (!fighter) return {} as Fighter;
+    
     const names = ["Mike Johnson", "Carlos Ramirez", "Tommy Wilson", "Angelo Bruno", "Vladimir Petrov"];
     const selectedName = names[Math.floor(Math.random() * names.length)];
     
@@ -163,8 +159,8 @@ const BoxingGame = () => {
     setGameState("fight");
   };
 
-  const makeFightChoice = (choice: FightChoice) => {
-    if (!currentFight) return;
+  const makeFightChoice = (choice: FightChoice, result: string) => {
+    if (!currentFight || !fighter) return;
 
     const newStamina = Math.max(0, fighter.stamina - choice.staminaCost);
     const success = Math.random() < choice.successChance;
@@ -173,16 +169,14 @@ const BoxingGame = () => {
     // Opponent logic (simplified)
     const opponentPoints = Math.random() < 0.5 ? 1 : 0;
     
-    const commentary = generateCommentary(choice, success, currentFight.round);
-    
-    setFighter(prev => ({ ...prev, stamina: newStamina }));
+    setFighter(prev => prev ? ({ ...prev, stamina: newStamina }) : null);
     
     setCurrentFight(prev => {
       if (!prev) return null;
       
       const newPlayerScore = prev.playerScore + points;
       const newOpponentScore = prev.opponentScore + opponentPoints;
-      const newCommentary = [...prev.commentary, commentary];
+      const newCommentary = [...prev.commentary, result];
       
       // Check if fight should end
       if (prev.round >= 10 || newStamina <= 20) {
@@ -202,25 +196,27 @@ const BoxingGame = () => {
   };
 
   const endFight = (won: boolean) => {
+    if (!fighter) return;
+    
     if (won) {
-      setFighter(prev => ({
+      setFighter(prev => prev ? ({
         ...prev,
         wins: prev.wins + 1,
         experience: prev.experience + 10,
         popularity: Math.min(100, prev.popularity + 5),
         stamina: 100
-      }));
+      }) : null);
       toast({
         title: "Victory!",
         description: "You won the fight! Your reputation grows.",
       });
     } else {
-      setFighter(prev => ({
+      setFighter(prev => prev ? ({
         ...prev,
         losses: prev.losses + 1,
         experience: prev.experience + 3,
         stamina: 100
-      }));
+      }) : null);
       toast({
         title: "Defeat",
         description: "You lost this one, but you learned from it.",
@@ -232,18 +228,28 @@ const BoxingGame = () => {
   };
 
   const trainFighter = () => {
-    setFighter(prev => ({
+    if (!fighter) return;
+    
+    setFighter(prev => prev ? ({
       ...prev,
       power: Math.min(100, prev.power + 2),
       speed: Math.min(100, prev.speed + 2),
       defense: Math.min(100, prev.defense + 2),
       experience: prev.experience + 5
-    }));
+    }) : null);
     toast({
       title: "Training Complete",
       description: "Your skills have improved!",
     });
   };
+
+  if (gameState === "registration") {
+    return <RegistrationForm onCreateFighter={handleCreateFighter} />;
+  }
+
+  if (!fighter) {
+    return <div>Loading...</div>;
+  }
 
   if (gameState === "menu") {
     return (
@@ -278,74 +284,12 @@ const BoxingGame = () => {
 
   if (gameState === "fight" && currentFight) {
     return (
-      <div className="min-h-screen bg-gradient-ring p-4">
-        <div className="max-w-6xl mx-auto space-y-6">
-          {/* Fight Header */}
-          <Card className="p-6 bg-card border-boxing-red">
-            <div className="flex justify-between items-center mb-4">
-              <div className="text-center">
-                <h3 className="font-bold text-lg">{fighter.name}</h3>
-                <p className="text-sm text-muted-foreground">{fighter.wins}-{fighter.losses}</p>
-              </div>
-              <div className="text-center">
-                <Badge className="bg-boxing-red text-white text-lg px-4 py-2">
-                  ROUND {currentFight.round}
-                </Badge>
-              </div>
-              <div className="text-center">
-                <h3 className="font-bold text-lg">{currentFight.opponent.name}</h3>
-                <p className="text-sm text-muted-foreground">{currentFight.opponent.wins}-{currentFight.opponent.losses}</p>
-              </div>
-            </div>
-            
-            {/* Score */}
-            <div className="flex justify-center space-x-8 mb-4">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-boxing-gold">{currentFight.playerScore}</div>
-                <div className="text-sm">YOU</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-boxing-gold">{currentFight.opponentScore}</div>
-                <div className="text-sm">OPPONENT</div>
-              </div>
-            </div>
-
-            {/* Stamina */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Stamina</span>
-                <span>{fighter.stamina}%</span>
-              </div>
-              <Progress value={fighter.stamina} className="h-3" />
-            </div>
-          </Card>
-
-          {/* Commentary */}
-          <Card className="p-4 bg-card border-boxing-red h-32 overflow-y-auto">
-            <div className="space-y-2">
-              {currentFight.commentary.slice(-3).map((comment, index) => (
-                <p key={index} className="text-sm italic">{comment}</p>
-              ))}
-            </div>
-          </Card>
-
-          {/* Fight Choices */}
-          <div className="grid grid-cols-2 gap-4">
-            {fightChoices.map((choice) => (
-              <Button
-                key={choice.id}
-                onClick={() => makeFightChoice(choice)}
-                className="h-20 flex-col bg-gradient-danger hover:scale-105 transition-transform"
-                disabled={fighter.stamina < choice.staminaCost}
-              >
-                <div className="font-bold">{choice.id}</div>
-                <div className="text-sm text-center">{choice.text}</div>
-                <div className="text-xs opacity-75">Stamina: -{choice.staminaCost}</div>
-              </Button>
-            ))}
-          </div>
-        </div>
-      </div>
+      <FightInterface 
+        fighter={fighter}
+        currentFight={currentFight}
+        onFightChoice={makeFightChoice}
+        onEndFight={endFight}
+      />
     );
   }
 
