@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import RegistrationForm from "./RegistrationForm";
 import FightInterface from "./FightInterface";
+import TrainingInterface from "./TrainingInterface";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Sword, Dumbbell, Users, MessageSquare, Trophy, Calendar, Settings, Star } from "lucide-react";
 
 export interface Fighter {
   name: string;
@@ -227,19 +230,41 @@ const BoxingGame = () => {
     setGameState("career");
   };
 
-  const trainFighter = () => {
+  const trainStat = (stat: string) => {
     if (!fighter) return;
     
-    setFighter(prev => prev ? ({
-      ...prev,
-      power: Math.min(100, prev.power + 2),
-      speed: Math.min(100, prev.speed + 2),
-      defense: Math.min(100, prev.defense + 2),
-      experience: prev.experience + 5
-    }) : null);
+    const improvement = 2 + Math.floor(Math.random() * 4); // 2-5 points
+    
+    setFighter(prev => {
+      if (!prev) return null;
+      
+      const updates: Partial<Fighter> = { experience: prev.experience + 3 };
+      
+      switch (stat) {
+        case "power":
+          updates.power = Math.min(100, prev.power + improvement);
+          break;
+        case "speed":
+          updates.speed = Math.min(100, prev.speed + improvement);
+          break;
+        case "defense":
+          updates.defense = Math.min(100, prev.defense + improvement);
+          break;
+        case "stamina":
+          updates.stamina = Math.min(100, prev.stamina + improvement);
+          break;
+        case "technique":
+        case "mental":
+          updates.experience = prev.experience + improvement;
+          break;
+      }
+      
+      return { ...prev, ...updates };
+    });
+    
     toast({
       title: "Training Complete",
-      description: "Your skills have improved!",
+      description: `${stat.charAt(0).toUpperCase() + stat.slice(1)} improved by ${improvement} points!`,
     });
   };
 
@@ -293,84 +318,138 @@ const BoxingGame = () => {
     );
   }
 
+  if (gameState === "training") {
+    return (
+      <TrainingInterface
+        fighter={fighter}
+        onTrainStat={trainStat}
+        onBack={() => setGameState("career")}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-ring p-4">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Fighter Profile */}
-        <Card className="p-6 bg-card border-boxing-red shadow-boxer">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h2 className="text-2xl font-bold text-boxing-gold mb-4">{fighter.name}</h2>
-              <div className="space-y-2">
-                <p><span className="font-semibold">Age:</span> {fighter.age}</p>
-                <p><span className="font-semibold">Division:</span> {fighter.division}</p>
-                <p><span className="font-semibold">Record:</span> {fighter.wins}-{fighter.losses} ({fighter.ko} KO)</p>
-                <p><span className="font-semibold">Popularity:</span> {fighter.popularity}%</p>
-              </div>
-            </div>
+        {/* Boxer Avatar & Profile Header */}
+        <Card className="p-8 bg-card border-boxing-red shadow-champion">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <Avatar className="h-32 w-32 border-4 border-boxing-gold shadow-boxer">
+              <AvatarImage src="/placeholder.svg" alt={fighter.name} />
+              <AvatarFallback className="bg-gradient-champion text-boxing-dark text-2xl font-bold">
+                {fighter.name.split(' ').map(n => n[0]).join('')}
+              </AvatarFallback>
+            </Avatar>
             
-            <div className="space-y-3">
-              <div>
-                <div className="flex justify-between text-sm">
-                  <span>Power</span>
-                  <span>{fighter.power}</span>
+            <div>
+              <h1 className="text-4xl font-bold text-boxing-gold mb-2">{fighter.name}</h1>
+              <div className="flex items-center gap-4 text-lg">
+                <span className="font-semibold">{fighter.age} years old</span>
+                <span className="font-semibold">{fighter.division}</span>
+                <div className="flex items-center gap-1">
+                  <Trophy className="h-5 w-5 text-boxing-gold" />
+                  <span className="font-bold">{fighter.wins}-{fighter.losses} ({fighter.ko} KO)</span>
                 </div>
-                <Progress value={fighter.power} className="h-2" />
               </div>
-              <div>
-                <div className="flex justify-between text-sm">
-                  <span>Speed</span>
-                  <span>{fighter.speed}</span>
-                </div>
-                <Progress value={fighter.speed} className="h-2" />
-              </div>
-              <div>
-                <div className="flex justify-between text-sm">
-                  <span>Defense</span>
-                  <span>{fighter.defense}</span>
-                </div>
-                <Progress value={fighter.defense} className="h-2" />
-              </div>
-              <div>
-                <div className="flex justify-between text-sm">
-                  <span>Experience</span>
-                  <span>{fighter.experience}</span>
-                </div>
-                <Progress value={fighter.experience} className="h-2" />
+              <div className="flex items-center justify-center gap-1 mt-2">
+                <Star className="h-5 w-5 text-boxing-gold" />
+                <span className="font-semibold">Popularity: {fighter.popularity}%</span>
               </div>
             </div>
           </div>
         </Card>
 
-        {/* Manager Section */}
+        {/* Stats Overview */}
         <Card className="p-6 bg-card border-boxing-red">
-          <h3 className="text-xl font-bold text-boxing-gold mb-4">Manager: {manager.name}</h3>
+          <h3 className="text-xl font-bold text-boxing-gold mb-4">Fighter Stats</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { name: "Power", value: fighter.power, color: "text-red-500" },
+              { name: "Speed", value: fighter.speed, color: "text-yellow-500" },
+              { name: "Defense", value: fighter.defense, color: "text-blue-500" },
+              { name: "Experience", value: fighter.experience, color: "text-purple-500" }
+            ].map((stat) => (
+              <div key={stat.name} className="text-center">
+                <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+                <p className="text-sm text-muted-foreground">{stat.name}</p>
+                <Progress value={stat.value} className="h-2 mt-1" />
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Manager Advice */}
+        <Card className="p-6 bg-card border-boxing-red">
+          <div className="flex items-center gap-3 mb-4">
+            <Avatar className="h-12 w-12">
+              <AvatarImage src="/placeholder.svg" alt={manager.name} />
+              <AvatarFallback className="bg-muted">
+                {manager.name.split(' ').map(n => n[0]).join('')}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h3 className="text-lg font-bold text-boxing-gold">{manager.name}</h3>
+              <p className="text-sm text-muted-foreground">Your Manager</p>
+            </div>
+          </div>
           <div className="bg-muted p-4 rounded-lg">
             <p className="italic">"{manager.advice[Math.floor(Math.random() * manager.advice.length)]}"</p>
           </div>
         </Card>
 
-        {/* Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Button 
-            onClick={startFight}
-            className="h-16 bg-gradient-danger hover:scale-105 transition-transform font-bold text-lg"
-          >
-            FIND FIGHT
-          </Button>
-          <Button 
-            onClick={trainFighter}
-            className="h-16 bg-gradient-champion text-boxing-dark hover:scale-105 transition-transform font-bold text-lg"
-          >
-            TRAIN
-          </Button>
-          <Button 
-            variant="outline"
-            className="h-16 border-boxing-red text-boxing-red hover:bg-boxing-red/10"
-          >
-            CALL OUT RIVAL
-          </Button>
-        </div>
+        {/* Action Buttons */}
+        <Card className="p-6 bg-card border-boxing-red">
+          <h3 className="text-xl font-bold text-boxing-gold mb-6">Career Actions</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            <Button 
+              onClick={startFight}
+              className="h-20 bg-gradient-danger hover:scale-105 transition-transform flex flex-col gap-1"
+            >
+              <Sword className="h-6 w-6" />
+              <span className="text-sm font-bold">FIND FIGHT</span>
+            </Button>
+            
+            <Button 
+              onClick={() => setGameState("training")}
+              className="h-20 bg-gradient-champion text-boxing-dark hover:scale-105 transition-transform flex flex-col gap-1"
+            >
+              <Dumbbell className="h-6 w-6" />
+              <span className="text-sm font-bold">TRAINING</span>
+            </Button>
+            
+            <Button 
+              variant="outline"
+              className="h-20 border-boxing-red text-boxing-red hover:bg-boxing-red/10 flex flex-col gap-1"
+            >
+              <Users className="h-6 w-6" />
+              <span className="text-sm font-bold">CALL OUT</span>
+            </Button>
+            
+            <Button 
+              variant="outline"
+              className="h-20 border-boxing-red text-boxing-red hover:bg-boxing-red/10 flex flex-col gap-1"
+            >
+              <MessageSquare className="h-6 w-6" />
+              <span className="text-sm font-bold">MANAGER</span>
+            </Button>
+            
+            <Button 
+              variant="outline"
+              className="h-20 border-boxing-red text-boxing-red hover:bg-boxing-red/10 flex flex-col gap-1"
+            >
+              <Calendar className="h-6 w-6" />
+              <span className="text-sm font-bold">SCHEDULE</span>
+            </Button>
+            
+            <Button 
+              variant="outline"
+              className="h-20 border-boxing-red text-boxing-red hover:bg-boxing-red/10 flex flex-col gap-1"
+            >
+              <Settings className="h-6 w-6" />
+              <span className="text-sm font-bold">SETTINGS</span>
+            </Button>
+          </div>
+        </Card>
       </div>
     </div>
   );
