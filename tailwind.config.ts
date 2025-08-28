@@ -61,7 +61,25 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				boxing: {
+					red: 'hsl(var(--boxing-red))',
+					gold: 'hsl(var(--boxing-gold))',
+					canvas: 'hsl(var(--boxing-canvas))',
+					dark: 'hsl(var(--boxing-dark))',
+					leather: 'hsl(var(--boxing-leather))'
 				}
+			},
+			backgroundImage: {
+				'gradient-champion': 'var(--gradient-champion)',
+				'gradient-danger': 'var(--gradient-danger)',
+				'gradient-ring': 'var(--gradient-ring)',
+				'gradient-victory': 'var(--gradient-victory)'
+			},
+			boxShadow: {
+				'boxer': 'var(--shadow-boxer)',
+				'champion': 'var(--shadow-champion)',
+				'intense': 'var(--shadow-intense)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
