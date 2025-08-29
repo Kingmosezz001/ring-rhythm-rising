@@ -363,54 +363,54 @@ const ScheduleInterface = ({ fighter, onBack, onStartFight }: ScheduleInterfaceP
               const estimatedPurse = generateFightOffer(opponent).purse;
               
               return (
-                <div key={opponent.name} className="bg-muted p-4 rounded-lg">
-                  <div className="flex justify-between items-start mb-4">
+                <div key={opponent.name} className="bg-muted p-3 rounded-lg">
+                  <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
-                      <h4 className="text-xl font-bold text-boxing-gold">{opponent.name}</h4>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-                        <span>{opponent.age} years old</span>
+                      <h4 className="text-lg font-bold text-boxing-gold">{opponent.name}</h4>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
+                        <span>{opponent.age}y</span>
                         <span>{opponent.division}</span>
                         <div className="flex items-center gap-1">
-                          <Trophy className="h-4 w-4" />
+                          <Trophy className="h-3 w-3" />
                           <span>{opponent.wins}-{opponent.losses} ({opponent.ko} KO)</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 text-boxing-gold" />
-                          <span>{opponent.popularity}% popularity</span>
+                          <Star className="h-3 w-3 text-boxing-gold" />
+                          <span>{opponent.popularity}%</span>
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-4 gap-4 mt-3">
+                      <div className="grid grid-cols-4 gap-2 mt-2">
                         <div className="text-center">
                           <div className="flex items-center justify-center gap-1 mb-1">
-                            <Zap className="h-4 w-4 text-red-500" />
-                            <span className="text-xs font-semibold">POWER</span>
+                            <Zap className="h-3 w-3 text-red-500" />
+                            <span className="text-xs font-semibold">PWR</span>
                           </div>
-                          <Progress value={opponent.power} className="h-2" />
+                          <Progress value={opponent.power} className="h-1" />
                           <span className="text-xs text-muted-foreground">{opponent.power}</span>
                         </div>
                         <div className="text-center">
                           <div className="flex items-center justify-center gap-1 mb-1">
-                            <Zap className="h-4 w-4 text-yellow-500" />
-                            <span className="text-xs font-semibold">SPEED</span>
+                            <Zap className="h-3 w-3 text-yellow-500" />
+                            <span className="text-xs font-semibold">SPD</span>
                           </div>
-                          <Progress value={opponent.speed} className="h-2" />
+                          <Progress value={opponent.speed} className="h-1" />
                           <span className="text-xs text-muted-foreground">{opponent.speed}</span>
                         </div>
                         <div className="text-center">
                           <div className="flex items-center justify-center gap-1 mb-1">
-                            <Shield className="h-4 w-4 text-blue-500" />
-                            <span className="text-xs font-semibold">DEFENSE</span>
+                            <Shield className="h-3 w-3 text-blue-500" />
+                            <span className="text-xs font-semibold">DEF</span>
                           </div>
-                          <Progress value={opponent.defense} className="h-2" />
+                          <Progress value={opponent.defense} className="h-1" />
                           <span className="text-xs text-muted-foreground">{opponent.defense}</span>
                         </div>
                         <div className="text-center">
                           <div className="flex items-center justify-center gap-1 mb-1">
-                            <Star className="h-4 w-4 text-purple-500" />
+                            <Star className="h-3 w-3 text-purple-500" />
                             <span className="text-xs font-semibold">EXP</span>
                           </div>
-                          <Progress value={opponent.experience} className="h-2" />
+                          <Progress value={opponent.experience} className="h-1" />
                           <span className="text-xs text-muted-foreground">{opponent.experience}</span>
                         </div>
                       </div>
@@ -418,18 +418,19 @@ const ScheduleInterface = ({ fighter, onBack, onStartFight }: ScheduleInterfaceP
                     
                     <div className="text-right">
                       <div className="flex items-center gap-1 mb-2">
-                        <DollarSign className="h-5 w-5 text-boxing-gold" />
-                        <span className="text-lg font-bold text-boxing-gold">
+                        <DollarSign className="h-4 w-4 text-boxing-gold" />
+                        <span className="text-sm font-bold text-boxing-gold">
                           ~${estimatedPurse.toLocaleString()}
                         </span>
                       </div>
                       <Button
                         onClick={() => makeOffer(opponent)}
                         disabled={alreadyOffered}
-                        className="bg-gradient-danger hover:scale-105 transition-transform"
+                        className="bg-gradient-danger hover:scale-105 transition-transform text-xs px-3 py-2"
+                        size="sm"
                       >
-                        <Calendar className="h-4 w-4 mr-2" />
-                        {alreadyOffered ? "OFFER SENT" : "SEND OFFER"}
+                        <Calendar className="h-3 w-3 mr-1" />
+                        {alreadyOffered ? "SENT" : "OFFER"}
                       </Button>
                     </div>
                   </div>
