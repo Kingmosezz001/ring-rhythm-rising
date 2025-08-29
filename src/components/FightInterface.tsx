@@ -29,6 +29,7 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
   const [lastResult, setLastResult] = useState<string>("");
   const [showResult, setShowResult] = useState(false);
   const [fightIntensity, setFightIntensity] = useState<"low" | "medium" | "high" | "extreme">("medium");
+  const [showPreFight, setShowPreFight] = useState(true);
 
   const generateDynamicChoices = (): FightChoice[] => {
     const baseChoices = [
@@ -236,6 +237,101 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
       onFightChoice(choice, result);
     }, 3000);
   };
+
+  if (showPreFight) {
+    return (
+      <div className="min-h-screen bg-gradient-ring p-4 flex items-center justify-center">
+        <Card className="max-w-6xl p-8 bg-card border-boxing-red">
+          <div className="text-center space-y-6">
+            <Badge className="bg-boxing-red text-white text-2xl px-6 py-3">
+              TALE OF THE TAPE
+            </Badge>
+            
+            <div className="grid grid-cols-3 gap-8 mt-8">
+              {/* Player Stats */}
+              <div className="space-y-4">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-boxing-gold">{fighter.name}</h2>
+                  <p className="text-muted-foreground">Record: {fighter.wins}-{fighter.losses} ({fighter.ko} KO)</p>
+                </div>
+                <div className="space-y-3 text-left">
+                  <div className="flex justify-between">
+                    <span>Power:</span>
+                    <span className="text-boxing-gold font-bold">{fighter.power}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Speed:</span>
+                    <span className="text-boxing-gold font-bold">{fighter.speed}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Defense:</span>
+                    <span className="text-boxing-gold font-bold">{fighter.defense}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Experience:</span>
+                    <span className="text-boxing-gold font-bold">{fighter.experience}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Age:</span>
+                    <span className="text-boxing-gold font-bold">{fighter.age}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Division:</span>
+                    <span className="text-boxing-gold font-bold">{fighter.division}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* VS Section */}
+              <div className="flex flex-col justify-center items-center">
+                <div className="text-6xl font-bold text-boxing-red">VS</div>
+                <Button 
+                  onClick={() => setShowPreFight(false)}
+                  className="mt-8 bg-gradient-champion text-boxing-dark font-bold text-xl px-8 py-4"
+                >
+                  LET'S GET READY TO RUMBLE!
+                </Button>
+              </div>
+
+              {/* Opponent Stats */}
+              <div className="space-y-4">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-boxing-gold">{currentFight.opponent.name}</h2>
+                  <p className="text-muted-foreground">Record: {currentFight.opponent.wins}-{currentFight.opponent.losses} ({currentFight.opponent.ko} KO)</p>
+                </div>
+                <div className="space-y-3 text-right">
+                  <div className="flex justify-between">
+                    <span className="text-boxing-gold font-bold">{currentFight.opponent.power}</span>
+                    <span>:Power</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-boxing-gold font-bold">{currentFight.opponent.speed}</span>
+                    <span>:Speed</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-boxing-gold font-bold">{currentFight.opponent.defense}</span>
+                    <span>:Defense</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-boxing-gold font-bold">{currentFight.opponent.experience}</span>
+                    <span>:Experience</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-boxing-gold font-bold">{currentFight.opponent.age}</span>
+                    <span>:Age</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-boxing-gold font-bold">{currentFight.opponent.division}</span>
+                    <span>:Division</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   if (showResult) {
     return (

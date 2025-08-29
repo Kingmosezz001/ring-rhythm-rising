@@ -210,31 +210,95 @@ const MediaInterface = ({ fighter, onBack, onUpdateSocialMedia }: MediaInterface
           </div>
         </Card>
 
-        {/* Platform Tabs */}
+        {/* Platform Selection */}
+        <div className="grid grid-cols-2 gap-6">
+          <Card 
+            className={`p-6 cursor-pointer transition-all border-2 ${
+              activeTab === "tiktok" 
+                ? "border-pink-500 bg-gradient-to-b from-pink-500/20 to-purple-600/20" 
+                : "border-boxing-red bg-card hover:border-pink-400"
+            }`}
+            onClick={() => setActiveTab("tiktok")}
+          >
+            <div className="text-center space-y-3">
+              <Video className="h-12 w-12 mx-auto text-pink-500" />
+              <h3 className="text-xl font-bold text-pink-500">TikTok</h3>
+              <p className="text-sm text-muted-foreground">Short video content platform</p>
+              <div className="bg-black rounded-lg p-3 text-white text-xs">
+                <div className="flex justify-between items-center mb-2">
+                  <span>@{fighter.name.toLowerCase().replace(' ', '')}</span>
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <div className="h-1 bg-pink-500 rounded w-3/4"></div>
+                  <div className="h-1 bg-gray-600 rounded w-1/2"></div>
+                  <div className="h-1 bg-gray-600 rounded w-2/3"></div>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card 
+            className={`p-6 cursor-pointer transition-all border-2 ${
+              activeTab === "instagram" 
+                ? "border-purple-500 bg-gradient-to-b from-purple-500/20 to-pink-500/20" 
+                : "border-boxing-red bg-card hover:border-purple-400"
+            }`}
+            onClick={() => setActiveTab("instagram")}
+          >
+            <div className="text-center space-y-3">
+              <Camera className="h-12 w-12 mx-auto text-purple-500" />
+              <h3 className="text-xl font-bold text-purple-500">Instagram</h3>
+              <p className="text-sm text-muted-foreground">Photo & story sharing platform</p>
+              <div className="bg-white border rounded-lg p-3 text-black text-xs">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+                    <span className="font-semibold">@{fighter.name.toLowerCase().replace(' ', '')}</span>
+                  </div>
+                  <div className="text-gray-500">•••</div>
+                </div>
+                <div className="space-y-1">
+                  <div className="h-1 bg-purple-500 rounded w-full"></div>
+                  <div className="h-1 bg-gray-300 rounded w-2/3"></div>
+                  <div className="h-1 bg-gray-300 rounded w-3/4"></div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Platform Interface */}
         <Card className="p-6 bg-card border-boxing-red">
-          <div className="flex gap-4 mb-6">
-            <Button
-              onClick={() => setActiveTab("tiktok")}
-              variant={activeTab === "tiktok" ? "default" : "outline"}
-              className={activeTab === "tiktok" ? "bg-gradient-danger" : "border-boxing-red text-boxing-red"}
-            >
-              <Video className="h-4 w-4 mr-2" />
-              TikTok
-            </Button>
-            <Button
-              onClick={() => setActiveTab("instagram")}
-              variant={activeTab === "instagram" ? "default" : "outline"}
-              className={activeTab === "instagram" ? "bg-gradient-danger" : "border-boxing-red text-boxing-red"}
-            >
-              <Camera className="h-4 w-4 mr-2" />
-              Instagram
-            </Button>
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold mb-2">
+              <span className={activeTab === "tiktok" ? "text-pink-500" : "text-purple-500"}>
+                {activeTab === "tiktok" ? "TikTok" : "Instagram"}
+              </span>
+              <span className="text-boxing-gold"> Dashboard</span>
+            </h3>
+            <p className="text-muted-foreground">
+              {activeTab === "tiktok" 
+                ? "Create viral boxing content and call out opponents" 
+                : "Share your training photos and behind-the-scenes content"
+              }
+            </p>
           </div>
 
           {/* Post Creation */}
-          <div className="bg-muted p-4 rounded-lg mb-6">
-            <h3 className="text-lg font-bold text-boxing-gold mb-4">
-              Create {activeTab === "tiktok" ? "TikTok Video" : "Instagram Post"}
+          <div className={`${
+            activeTab === "tiktok" 
+              ? "bg-gradient-to-r from-pink-500/10 to-purple-600/10 border border-pink-500/30" 
+              : "bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30"
+          } p-4 rounded-lg mb-6`}>
+            <h3 className="text-lg font-bold mb-4">
+              <span className={activeTab === "tiktok" ? "text-pink-500" : "text-purple-500"}>
+                Create {activeTab === "tiktok" ? "TikTok Video" : "Instagram Post"}
+              </span>
             </h3>
             <Textarea
               placeholder={`What's on your mind, ${fighter.name}? Share your thoughts, call out opponents, or motivate your fans!`}
@@ -271,7 +335,11 @@ const MediaInterface = ({ fighter, onBack, onUpdateSocialMedia }: MediaInterface
             </div>
             <Button
               onClick={handlePost}
-              className="bg-gradient-champion text-boxing-dark font-bold"
+              className={`font-bold ${
+                activeTab === "tiktok" 
+                  ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white" 
+                  : "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+              }`}
             >
               <Send className="h-4 w-4 mr-2" />
               Post to {activeTab === "tiktok" ? "TikTok" : "Instagram"}
@@ -288,8 +356,14 @@ const MediaInterface = ({ fighter, onBack, onUpdateSocialMedia }: MediaInterface
             ) : (
               posts.map((post) => (
                 <div key={post.id} className="bg-background p-4 rounded-lg border">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant={post.platform === "tiktok" ? "destructive" : "secondary"}>
+                 <div className="flex items-center gap-2 mb-2">
+                    <Badge 
+                      className={
+                        post.platform === "tiktok" 
+                          ? "bg-pink-500 text-white" 
+                          : "bg-purple-500 text-white"
+                      }
+                    >
                       {post.platform === "tiktok" ? "TikTok" : "Instagram"}
                     </Badge>
                     <span className="text-sm text-muted-foreground">

@@ -62,6 +62,7 @@ const BoxingGame = () => {
   const [fighter, setFighter] = useState<Fighter | null>(null);
   const [currentWeek, setCurrentWeek] = useState(1);
   const [incomingCallouts, setIncomingCallouts] = useState<Fighter[]>([]);
+  const [isAdvancingWeek, setIsAdvancingWeek] = useState(false);
 
   const [manager] = useState<Manager>({
     name: "Tony Martinez",
@@ -376,31 +377,36 @@ const BoxingGame = () => {
   const advanceWeek = () => {
     if (!fighter) return;
     
-    // Generate callouts if fighter is popular enough
-    const shouldReceiveCallout = fighter.popularity > 50 && Math.random() < 0.3;
-    let newCallouts: Fighter[] = [];
+    setIsAdvancingWeek(true);
     
-    if (shouldReceiveCallout) {
-      const calloutFighter = generateOpponent();
-      calloutFighter.name = "Jake Thompson"; // Example challenger
-      newCallouts = [calloutFighter];
-    }
-    
-    setFighter(prev => prev ? ({
-      ...prev,
-      energy: Math.min(100, prev.energy + 25), // Recover energy each week
-      weeksSinceLastFight: prev.weeksSinceLastFight + 1
-    }) : null);
-    
-    setCurrentWeek(prev => prev + 1);
-    setIncomingCallouts(newCallouts);
-    
-    if (newCallouts.length > 0) {
-      toast({
-        title: "Challenge Received!",
-        description: `${newCallouts[0].name} has called you out for a fight!`,
-      });
-    }
+    setTimeout(() => {
+      // Generate callouts if fighter is popular enough
+      const shouldReceiveCallout = fighter.popularity > 50 && Math.random() < 0.3;
+      let newCallouts: Fighter[] = [];
+      
+      if (shouldReceiveCallout) {
+        const calloutFighter = generateOpponent();
+        calloutFighter.name = "Jake Thompson"; // Example challenger
+        newCallouts = [calloutFighter];
+      }
+      
+      setFighter(prev => prev ? ({
+        ...prev,
+        energy: Math.min(100, prev.energy + 25), // Recover energy each week
+        weeksSinceLastFight: prev.weeksSinceLastFight + 1
+      }) : null);
+      
+      setCurrentWeek(prev => prev + 1);
+      setIncomingCallouts(newCallouts);
+      setIsAdvancingWeek(false);
+      
+      if (newCallouts.length > 0) {
+        toast({
+          title: "Challenge Received!",
+          description: `${newCallouts[0].name} has called you out for a fight!`,
+        });
+      }
+    }, 3000);
   };
 
   const startFightCheck = () => {
@@ -584,6 +590,7 @@ const BoxingGame = () => {
         <div className="flex justify-end">
           <Button
             onClick={advanceWeek}
+            disabled={isAdvancingWeek}
             className="bg-gradient-champion text-boxing-dark font-bold"
             size="lg"
           >
@@ -591,6 +598,23 @@ const BoxingGame = () => {
             Week {currentWeek} → Next Week
           </Button>
         </div>
+
+        {/* Loading Animation */}
+        {isAdvancingWeek && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <Card className="p-8 bg-card border-boxing-red">
+              <div className="text-center space-y-4">
+                <div className="text-2xl font-bold text-boxing-gold">Advancing to Week {currentWeek + 1}</div>
+                <div className="flex justify-center space-x-2">
+                  <div className="w-8 h-8 rounded-full bg-boxing-red animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-8 h-8 rounded-full bg-boxing-gold animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-8 h-8 rounded-full bg-boxing-red animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                </div>
+                <div className="text-sm text-muted-foreground">Training, resting, and planning your next moves...</div>
+              </div>
+            </Card>
+          </div>
+        )}
         {/* Boxer Avatar & Profile Header */}
         <Card className="p-8 bg-card border-boxing-red shadow-champion">
           <div className="flex flex-col items-center text-center space-y-4">
@@ -758,6 +782,7 @@ const BoxingGame = () => {
             </Button>
             
             <Button 
+              onClick={() => setGameState("stats")}
               className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
             >
               <TrendingUp className="h-4 w-4" />
