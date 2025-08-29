@@ -726,82 +726,82 @@ const BoxingGame = () => {
           <div className="grid grid-cols-5 gap-1">
             <Button 
               onClick={startFightCheck}
-              className="h-16 bg-gradient-danger hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+              className="h-16 bg-gradient-danger hover:scale-105 transition-transform flex items-center justify-center"
+              title="Quick Fight"
             >
-              <Sword className="h-4 w-4" />
-              <span className="font-bold">FIGHT</span>
+              <Sword className="h-6 w-6" />
             </Button>
             
             <Button 
               onClick={() => setGameState("schedule")}
-              className="h-16 bg-gradient-champion text-boxing-dark hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+              className="h-16 bg-gradient-champion text-boxing-dark hover:scale-105 transition-transform flex items-center justify-center"
+              title="Schedule"
             >
-              <Calendar className="h-4 w-4" />
-              <span className="font-bold">SCHEDULE</span>
+              <Calendar className="h-6 w-6" />
             </Button>
             
             <Button 
               onClick={() => setGameState("training")}
-              className="h-16 bg-secondary hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+              className="h-16 bg-secondary hover:scale-105 transition-transform flex items-center justify-center"
+              title="Training"
             >
-              <Dumbbell className="h-4 w-4" />
-              <span className="font-bold">TRAINING</span>
+              <Dumbbell className="h-6 w-6" />
             </Button>
             
             <Button 
               onClick={() => setGameState("callout")}
-              className="h-16 bg-accent text-accent-foreground hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+              className="h-16 bg-accent text-accent-foreground hover:scale-105 transition-transform flex items-center justify-center"
+              title="Call Out"
             >
-              <MessageSquare className="h-4 w-4" />
-              <span className="font-bold">CALL OUT</span>
+              <MessageSquare className="h-6 w-6" />
             </Button>
 
             <Button 
               onClick={() => setGameState("media")}
-              className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+              className="h-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center"
+              title="Media"
             >
-              <Newspaper className="h-4 w-4" />
-              <span className="font-bold">MEDIA</span>
+              <Newspaper className="h-6 w-6" />
             </Button>
           </div>
           
           <div className="grid grid-cols-5 gap-1 mt-1">
             <Button 
               onClick={() => setGameState("contracts")}
-              className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+              className="h-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center"
+              title="Contracts"
             >
-              <Briefcase className="h-4 w-4" />
-              <span className="font-bold">CONTRACTS</span>
+              <Briefcase className="h-6 w-6" />
             </Button>
             
             <Button 
-              className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+              className="h-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center"
+              title="Team"
             >
-              <Users className="h-4 w-4" />
-              <span className="font-bold">TEAM</span>
+              <Users className="h-6 w-6" />
             </Button>
             
             <Button 
-              className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+              className="h-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center"
+              title="Rankings"
             >
-              <Trophy className="h-4 w-4" />
-              <span className="font-bold">RANKINGS</span>
+              <Trophy className="h-6 w-6" />
             </Button>
             
             <Button 
               onClick={() => setGameState("stats")}
-              className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+              className="h-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center"
+              title="Stats"
             >
-              <TrendingUp className="h-4 w-4" />
-              <span className="font-bold">STATS</span>
+              <TrendingUp className="h-6 w-6" />
             </Button>
             
             <Button 
               onClick={() => setGameState("settings")}
-              className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
+              className="h-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center"
+              title="Settings"
             >
-              <Settings className="h-4 w-4" />
-              <span className="font-bold">SETTINGS</span>
+              <Settings className="h-6 w-6" />
             </Button>
           </div>
         </div>
