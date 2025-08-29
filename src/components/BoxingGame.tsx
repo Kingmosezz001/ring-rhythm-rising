@@ -584,147 +584,152 @@ const BoxingGame = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-ring p-4">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Next Week Button - Top of Dashboard */}
-        <div className="flex justify-end">
-          <Button
-            onClick={advanceWeek}
-            disabled={isAdvancingWeek}
-            className="bg-gradient-champion text-boxing-dark font-bold"
-            size="lg"
-          >
-            <SkipForward className="h-5 w-5 mr-2" />
-            Week {currentWeek} → Next Week
-          </Button>
+    <div className="min-h-screen bg-gradient-ring relative">
+      {/* Next Week Button - Top of Dashboard */}
+      <div className="absolute top-4 right-4 z-10">
+        <Button
+          onClick={advanceWeek}
+          disabled={isAdvancingWeek}
+          className="bg-gradient-champion text-boxing-dark font-bold"
+          size="lg"
+        >
+          <SkipForward className="h-5 w-5 mr-2" />
+          Week {currentWeek} → Next Week
+        </Button>
+      </div>
+
+      {/* Loading Animation */}
+      {isAdvancingWeek && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="p-8 bg-card border-boxing-red">
+            <div className="text-center space-y-4">
+              <div className="text-2xl font-bold text-boxing-gold">Advancing to Week {currentWeek + 1}</div>
+              <div className="flex justify-center space-x-2">
+                <div className="w-8 h-8 rounded-full bg-boxing-red animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-8 h-8 rounded-full bg-boxing-gold animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-8 h-8 rounded-full bg-boxing-red animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+              <div className="text-sm text-muted-foreground">Training, resting, and planning your next moves...</div>
+            </div>
+          </Card>
         </div>
+      )}
 
-        {/* Loading Animation */}
-        {isAdvancingWeek && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <Card className="p-8 bg-card border-boxing-red">
-              <div className="text-center space-y-4">
-                <div className="text-2xl font-bold text-boxing-gold">Advancing to Week {currentWeek + 1}</div>
-                <div className="flex justify-center space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-boxing-red animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-8 h-8 rounded-full bg-boxing-gold animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-8 h-8 rounded-full bg-boxing-red animate-bounce" style={{ animationDelay: '300ms' }}></div>
+      {/* Scrollable Main Content */}
+      <div className="pb-20 p-4 overflow-y-auto">
+        <div className="max-w-6xl mx-auto space-y-6 pt-16">
+          {/* Boxer Avatar & Profile Header */}
+          <Card className="p-8 bg-card border-boxing-red shadow-champion">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <Avatar className="h-32 w-32 border-4 border-boxing-gold shadow-boxer">
+                <AvatarImage src="/placeholder.svg" alt={fighter.name} />
+                <AvatarFallback className="bg-gradient-champion text-boxing-dark text-2xl font-bold">
+                  {fighter.name.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
+              </Avatar>
+              
+              <div>
+                <h1 className="text-4xl font-bold text-boxing-gold mb-2">{fighter.name}</h1>
+                <div className="flex items-center gap-4 text-lg">
+                  <span className="font-semibold">{fighter.age} years old</span>
+                  <span className="font-semibold">{fighter.division}</span>
+                  <div className="flex items-center gap-1">
+                    <Trophy className="h-5 w-5 text-boxing-gold" />
+                    <span className="font-bold">{fighter.wins}-{fighter.losses} ({fighter.ko} KO)</span>
+                  </div>
                 </div>
-                <div className="text-sm text-muted-foreground">Training, resting, and planning your next moves...</div>
-              </div>
-            </Card>
-          </div>
-        )}
-        {/* Boxer Avatar & Profile Header */}
-        <Card className="p-8 bg-card border-boxing-red shadow-champion">
-          <div className="flex flex-col items-center text-center space-y-4">
-            <Avatar className="h-32 w-32 border-4 border-boxing-gold shadow-boxer">
-              <AvatarImage src="/placeholder.svg" alt={fighter.name} />
-              <AvatarFallback className="bg-gradient-champion text-boxing-dark text-2xl font-bold">
-                {fighter.name.split(' ').map(n => n[0]).join('')}
-              </AvatarFallback>
-            </Avatar>
-            
-            <div>
-              <h1 className="text-4xl font-bold text-boxing-gold mb-2">{fighter.name}</h1>
-              <div className="flex items-center gap-4 text-lg">
-                <span className="font-semibold">{fighter.age} years old</span>
-                <span className="font-semibold">{fighter.division}</span>
-                <div className="flex items-center gap-1">
-                  <Trophy className="h-5 w-5 text-boxing-gold" />
-                  <span className="font-bold">{fighter.wins}-{fighter.losses} ({fighter.ko} KO)</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-center gap-4 mt-2">
-                <div className="flex items-center gap-1">
-                  <Star className="h-5 w-5 text-boxing-gold" />
-                  <span className="font-semibold">Popularity: {fighter.popularity}%</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Battery className={`h-5 w-5 ${fighter.energy > 70 ? 'text-green-500' : fighter.energy > 30 ? 'text-yellow-500' : 'text-red-500'}`} />
-                  <span className="font-semibold">Energy: {fighter.energy}%</span>
+                <div className="flex items-center justify-center gap-4 mt-2">
+                  <div className="flex items-center gap-1">
+                    <Star className="h-5 w-5 text-boxing-gold" />
+                    <span className="font-semibold">Popularity: {fighter.popularity}%</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Battery className={`h-5 w-5 ${fighter.energy > 70 ? 'text-green-500' : fighter.energy > 30 ? 'text-yellow-500' : 'text-red-500'}`} />
+                    <span className="font-semibold">Energy: {fighter.energy}%</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </Card>
+          </Card>
 
-        {/* Stats Overview */}
-        <Card className="p-6 bg-card border-boxing-red">
-          <h3 className="text-xl font-bold text-boxing-gold mb-4">Fighter Stats</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { name: "Power", value: fighter.power, color: "text-red-500" },
-              { name: "Speed", value: fighter.speed, color: "text-yellow-500" },
-              { name: "Defense", value: fighter.defense, color: "text-blue-500" },
-              { name: "Experience", value: fighter.experience, color: "text-purple-500" }
-            ].map((stat) => (
-              <div key={stat.name} className="text-center">
-                <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-                <p className="text-sm text-muted-foreground">{stat.name}</p>
-                <Progress value={stat.value} className="h-2 mt-1" />
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Manager Advice */}
-        <Card className="p-6 bg-card border-boxing-red">
-          <div className="flex items-center gap-3 mb-4">
-            <Avatar className="h-12 w-12">
-              <AvatarImage src="/placeholder.svg" alt={manager.name} />
-              <AvatarFallback className="bg-muted">
-                {manager.name.split(' ').map(n => n[0]).join('')}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h3 className="text-lg font-bold text-boxing-gold">{manager.name}</h3>
-              <p className="text-sm text-muted-foreground">Your Manager</p>
+          {/* Stats Overview */}
+          <Card className="p-6 bg-card border-boxing-red">
+            <h3 className="text-xl font-bold text-boxing-gold mb-4">Fighter Stats</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { name: "Power", value: fighter.power, color: "text-red-500" },
+                { name: "Speed", value: fighter.speed, color: "text-yellow-500" },
+                { name: "Defense", value: fighter.defense, color: "text-blue-500" },
+                { name: "Experience", value: fighter.experience, color: "text-purple-500" }
+              ].map((stat) => (
+                <div key={stat.name} className="text-center">
+                  <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+                  <p className="text-sm text-muted-foreground">{stat.name}</p>
+                  <Progress value={stat.value} className="h-2 mt-1" />
+                </div>
+              ))}
             </div>
-          </div>
-          <div className="bg-muted p-4 rounded-lg">
-            <p className="italic">"{manager.advice[Math.floor(Math.random() * manager.advice.length)]}"</p>
-          </div>
-        </Card>
+          </Card>
 
-        {/* Fighter Money & Status */}
-        <Card className="p-4 bg-card border-boxing-red">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-boxing-gold">${fighter.money.toLocaleString()}</p>
-                <p className="text-sm text-muted-foreground">Career Earnings</p>
+          {/* Manager Advice */}
+          <Card className="p-6 bg-card border-boxing-red">
+            <div className="flex items-center gap-3 mb-4">
+              <Avatar className="h-12 w-12">
+                <AvatarImage src="/placeholder.svg" alt={manager.name} />
+                <AvatarFallback className="bg-muted">
+                  {manager.name.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="text-lg font-bold text-boxing-gold">{manager.name}</h3>
+                <p className="text-sm text-muted-foreground">Your Manager</p>
               </div>
-              {fighter.injuries.length > 0 && (
+            </div>
+            <div className="bg-muted p-4 rounded-lg">
+              <p className="italic">"{manager.advice[Math.floor(Math.random() * manager.advice.length)]}"</p>
+            </div>
+          </Card>
+
+          {/* Fighter Money & Status */}
+          <Card className="p-4 bg-card border-boxing-red">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-4">
                 <div className="text-center">
-                  <Badge variant="destructive" className="mb-1">
-                    {fighter.injuries.length} Injuries
-                  </Badge>
-                  <p className="text-xs text-muted-foreground">{fighter.injuries[0]}</p>
+                  <p className="text-2xl font-bold text-boxing-gold">${fighter.money.toLocaleString()}</p>
+                  <p className="text-sm text-muted-foreground">Career Earnings</p>
                 </div>
-              )}
-              {fighter.facialDamage > 0 && (
-                <div className="text-center">
-                  <Badge variant="secondary" className="mb-1">
-                    Facial Damage
-                  </Badge>
-                  <Progress value={fighter.facialDamage} className="h-2 w-16" />
-                </div>
-              )}
+                {fighter.injuries.length > 0 && (
+                  <div className="text-center">
+                    <Badge variant="destructive" className="mb-1">
+                      {fighter.injuries.length} Injuries
+                    </Badge>
+                    <p className="text-xs text-muted-foreground">{fighter.injuries[0]}</p>
+                  </div>
+                )}
+                {fighter.facialDamage > 0 && (
+                  <div className="text-center">
+                    <Badge variant="secondary" className="mb-1">
+                      Facial Damage
+                    </Badge>
+                    <Progress value={fighter.facialDamage} className="h-2 w-16" />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
+      </div>
 
-        {/* Action Buttons */}
-        <Card className="p-6 bg-card border-boxing-red">
-          <h3 className="text-xl font-bold text-boxing-gold mb-6">Career Actions</h3>
-          <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-2">
+      {/* Fixed Floating Action Buttons */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-boxing-red p-2 z-40">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-5 gap-1">
             <Button 
-              onClick={startFight}
+              onClick={startFightCheck}
               className="h-16 bg-gradient-danger hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
             >
               <Sword className="h-4 w-4" />
-              <span className="font-bold">QUICK FIGHT</span>
+              <span className="font-bold">FIGHT</span>
             </Button>
             
             <Button 
@@ -758,7 +763,9 @@ const BoxingGame = () => {
               <Newspaper className="h-4 w-4" />
               <span className="font-bold">MEDIA</span>
             </Button>
-            
+          </div>
+          
+          <div className="grid grid-cols-5 gap-1 mt-1">
             <Button 
               onClick={() => setGameState("contracts")}
               className="h-16 bg-muted hover:scale-105 transition-transform flex flex-col gap-1 text-xs"
@@ -797,7 +804,7 @@ const BoxingGame = () => {
               <span className="font-bold">SETTINGS</span>
             </Button>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );
