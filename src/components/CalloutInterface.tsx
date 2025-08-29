@@ -89,7 +89,16 @@ const CalloutInterface = ({ fighter, onBack, onStartFight }: CalloutInterfacePro
       experience: Math.min(100, 50 + (boxerData.wins * 2)),
       injuries: [],
       facialDamage: 0,
-      money: 50000
+      money: 50000,
+      energy: 100,
+      weeksSinceLastFight: 0,
+      socialMedia: {
+        followers: Math.floor(boxerData.popularity * 10000),
+        totalPosts: Math.floor(Math.random() * 500) + 100,
+        totalLikes: Math.floor(boxerData.popularity * 50000),
+        totalComments: Math.floor(boxerData.popularity * 5000),
+        totalShares: Math.floor(boxerData.popularity * 2500)
+      }
     };
   };
 

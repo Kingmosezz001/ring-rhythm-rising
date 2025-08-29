@@ -51,7 +51,16 @@ const RegistrationForm = ({ onCreateFighter }: RegistrationFormProps) => {
       experience: 0,
       injuries: [],
       facialDamage: 0,
-      money: 25000
+      money: 25000,
+      energy: 100,
+      weeksSinceLastFight: 0,
+      socialMedia: {
+        followers: 100,
+        totalPosts: 0,
+        totalLikes: 0,
+        totalComments: 0,
+        totalShares: 0
+      }
     };
 
     onCreateFighter(fighter);

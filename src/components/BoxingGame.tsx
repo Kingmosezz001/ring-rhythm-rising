@@ -11,8 +11,9 @@ import CalloutInterface from "./CalloutInterface";
 import ScheduleInterface from "./ScheduleInterface";
 import MediaInterface from "./MediaInterface";
 import SettingsInterface from "./SettingsInterface";
+import StatsInterface from "./StatsInterface";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Sword, Dumbbell, Users, MessageSquare, Trophy, Calendar, Settings, Star, Briefcase, Newspaper, TrendingUp, Shield } from "lucide-react";
+import { Sword, Dumbbell, Users, MessageSquare, Trophy, Calendar, Settings, Star, Briefcase, Newspaper, TrendingUp, Shield, SkipForward, Battery } from "lucide-react";
 
 export interface Fighter {
   name: string;
@@ -30,6 +31,15 @@ export interface Fighter {
   injuries: string[];
   facialDamage: number;
   money: number;
+  energy: number;
+  weeksSinceLastFight: number;
+  socialMedia: {
+    followers: number;
+    totalPosts: number;
+    totalLikes: number;
+    totalComments: number;
+    totalShares: number;
+  };
 }
 
 export interface Manager {
@@ -48,8 +58,10 @@ export interface FightChoice {
 
 const BoxingGame = () => {
   const { toast } = useToast();
-  const [gameState, setGameState] = useState<"registration" | "menu" | "career" | "fight" | "training" | "callout" | "schedule" | "media" | "contracts" | "settings">("registration");
+  const [gameState, setGameState] = useState<"registration" | "menu" | "career" | "fight" | "training" | "callout" | "schedule" | "media" | "contracts" | "settings" | "stats">("registration");
   const [fighter, setFighter] = useState<Fighter | null>(null);
+  const [currentWeek, setCurrentWeek] = useState(1);
+  const [incomingCallouts, setIncomingCallouts] = useState<Fighter[]>([]);
 
   const [manager] = useState<Manager>({
     name: "Tony Martinez",
@@ -81,7 +93,16 @@ const BoxingGame = () => {
       ...newFighter,
       injuries: [],
       facialDamage: 0,
-      money: 25000
+      money: 25000,
+      energy: 100,
+      weeksSinceLastFight: 0,
+      socialMedia: {
+        followers: 100,
+        totalPosts: 0,
+        totalLikes: 0,
+        totalComments: 0,
+        totalShares: 0
+      }
     });
     setGameState("menu");
   };
@@ -111,7 +132,16 @@ const BoxingGame = () => {
       experience: Math.floor(Math.random() * 50),
       injuries: [],
       facialDamage: 0,
-      money: 10000
+      money: 10000,
+      energy: 100,
+      weeksSinceLastFight: 0,
+      socialMedia: {
+        followers: Math.floor(Math.random() * 1000),
+        totalPosts: 0,
+        totalLikes: 0,
+        totalComments: 0,
+        totalShares: 0
+      }
     };
   };
 
@@ -257,7 +287,8 @@ const BoxingGame = () => {
         wins: prev.wins + 1,
         experience: prev.experience + experienceGain,
         popularity: Math.min(100, prev.popularity + popularityGain),
-        stamina: 100
+        stamina: 100,
+        weeksSinceLastFight: 0
       }) : null);
       
       toast({
@@ -269,7 +300,8 @@ const BoxingGame = () => {
         ...prev,
         losses: prev.losses + 1,
         experience: prev.experience + 2, // Less experience from losses
-        stamina: 100
+        stamina: 100,
+        weeksSinceLastFight: 0
       }) : null);
       
       toast({
@@ -285,6 +317,15 @@ const BoxingGame = () => {
   const trainStat = (stat: string) => {
     if (!fighter) return;
     
+    if (fighter.energy < 20) {
+      toast({
+        title: "Too Exhausted!",
+        description: "You need to rest before training again!",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     // Much slower progression - 1-3 points with diminishing returns
     const baseImprovement = 1 + Math.floor(Math.random() * 3);
     const currentStat = stat === "power" ? fighter.power : 
@@ -299,7 +340,10 @@ const BoxingGame = () => {
     setFighter(prev => {
       if (!prev) return null;
       
-      const updates: Partial<Fighter> = { experience: prev.experience + 3 };
+      const updates: Partial<Fighter> = { 
+        experience: prev.experience + 3,
+        energy: Math.max(0, prev.energy - 15) // Training costs energy
+      };
       
       switch (stat) {
         case "power":
@@ -325,8 +369,62 @@ const BoxingGame = () => {
     
     toast({
       title: "Training Complete",
-      description: `${stat.charAt(0).toUpperCase() + stat.slice(1)} improved by ${improvement} points!`,
+      description: `${stat.charAt(0).toUpperCase() + stat.slice(1)} improved by ${improvement} points! Energy decreased.`,
     });
+  };
+
+  const advanceWeek = () => {
+    if (!fighter) return;
+    
+    // Generate callouts if fighter is popular enough
+    const shouldReceiveCallout = fighter.popularity > 50 && Math.random() < 0.3;
+    let newCallouts: Fighter[] = [];
+    
+    if (shouldReceiveCallout) {
+      const calloutFighter = generateOpponent();
+      calloutFighter.name = "Jake Thompson"; // Example challenger
+      newCallouts = [calloutFighter];
+    }
+    
+    setFighter(prev => prev ? ({
+      ...prev,
+      energy: Math.min(100, prev.energy + 25), // Recover energy each week
+      weeksSinceLastFight: prev.weeksSinceLastFight + 1
+    }) : null);
+    
+    setCurrentWeek(prev => prev + 1);
+    setIncomingCallouts(newCallouts);
+    
+    if (newCallouts.length > 0) {
+      toast({
+        title: "Challenge Received!",
+        description: `${newCallouts[0].name} has called you out for a fight!`,
+      });
+    }
+  };
+
+  const startFightCheck = () => {
+    if (!fighter) return;
+    
+    if (fighter.energy < 70) {
+      toast({
+        title: "Not Ready to Fight",
+        description: "You need at least 70% energy to compete! Rest or wait for next week.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (fighter.weeksSinceLastFight < 2) {
+      toast({
+        title: "Too Soon to Fight",
+        description: "You need more recovery time between fights!",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    startFight();
   };
 
   if (gameState === "registration") {
@@ -442,6 +540,12 @@ const BoxingGame = () => {
       <MediaInterface
         fighter={fighter}
         onBack={() => setGameState("career")}
+        onUpdateSocialMedia={(socialData) => {
+          setFighter(prev => prev ? ({
+            ...prev,
+            socialMedia: socialData
+          }) : null);
+        }}
       />
     );
   }
@@ -452,7 +556,7 @@ const BoxingGame = () => {
         fighter={fighter}
         onBack={() => setGameState("career")}
         onNextWeek={() => {
-          // Add week advancement logic here
+          advanceWeek();
           setGameState("career");
         }}
         onReset={() => {
@@ -463,9 +567,30 @@ const BoxingGame = () => {
     );
   }
 
+  if (gameState === "stats") {
+    return (
+      <StatsInterface
+        fighter={fighter}
+        currentWeek={currentWeek}
+        onBack={() => setGameState("career")}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-ring p-4">
       <div className="max-w-6xl mx-auto space-y-6">
+        {/* Next Week Button - Top of Dashboard */}
+        <div className="flex justify-end">
+          <Button
+            onClick={advanceWeek}
+            className="bg-gradient-champion text-boxing-dark font-bold"
+            size="lg"
+          >
+            <SkipForward className="h-5 w-5 mr-2" />
+            Week {currentWeek} → Next Week
+          </Button>
+        </div>
         {/* Boxer Avatar & Profile Header */}
         <Card className="p-8 bg-card border-boxing-red shadow-champion">
           <div className="flex flex-col items-center text-center space-y-4">
@@ -486,9 +611,15 @@ const BoxingGame = () => {
                   <span className="font-bold">{fighter.wins}-{fighter.losses} ({fighter.ko} KO)</span>
                 </div>
               </div>
-              <div className="flex items-center justify-center gap-1 mt-2">
-                <Star className="h-5 w-5 text-boxing-gold" />
-                <span className="font-semibold">Popularity: {fighter.popularity}%</span>
+              <div className="flex items-center justify-center gap-4 mt-2">
+                <div className="flex items-center gap-1">
+                  <Star className="h-5 w-5 text-boxing-gold" />
+                  <span className="font-semibold">Popularity: {fighter.popularity}%</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Battery className={`h-5 w-5 ${fighter.energy > 70 ? 'text-green-500' : fighter.energy > 30 ? 'text-yellow-500' : 'text-red-500'}`} />
+                  <span className="font-semibold">Energy: {fighter.energy}%</span>
+                </div>
               </div>
             </div>
           </div>

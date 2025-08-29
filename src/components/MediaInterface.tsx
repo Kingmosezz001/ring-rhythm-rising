@@ -11,6 +11,7 @@ import { ArrowLeft, Heart, MessageCircle, Share, Send, Camera, Video, Hash, AtSi
 interface MediaInterfaceProps {
   fighter: Fighter;
   onBack: () => void;
+  onUpdateSocialMedia: (socialData: Fighter['socialMedia']) => void;
 }
 
 interface SocialPost {
@@ -22,9 +23,17 @@ interface SocialPost {
   shares: number;
   timestamp: Date;
   hashtags: string[];
+  replies?: BoxerReply[];
 }
 
-const MediaInterface = ({ fighter, onBack }: MediaInterfaceProps) => {
+interface BoxerReply {
+  boxer: string;
+  message: string;
+  type: "ignore" | "reply" | "shun" | "follower_defend";
+  timestamp: Date;
+}
+
+const MediaInterface = ({ fighter, onBack, onUpdateSocialMedia }: MediaInterfaceProps) => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"tiktok" | "instagram">("tiktok");
   const [posts, setPosts] = useState<SocialPost[]>([]);
@@ -33,8 +42,52 @@ const MediaInterface = ({ fighter, onBack }: MediaInterfaceProps) => {
 
   const realBoxers = [
     "Canelo Alvarez", "Tyson Fury", "Anthony Joshua", "Gervonta Davis", "Ryan Garcia",
-    "Devin Haney", "Errol Spence Jr", "Terence Crawford", "Naoya Inoue", "Dmitry Bivol"
+    "Devin Haney", "Errol Spence Jr", "Terence Crawford", "Naoya Inoue", "Dmitry Bivol",
+    "Shakur Stevenson", "Tank Davis", "Jermell Charlo", "Keith Thurman", "Danny Garcia",
+    "Mikey Garcia", "Leo Santa Cruz", "Gary Russell Jr", "Vasiliy Lomachenko", "Teofimo Lopez",
+    "Josh Taylor", "Jose Ramirez", "Regis Prograis", "Julius Indongo", "Ivan Baranchyk"
   ];
+
+  const generateBoxerReply = (taggedBoxer: string, postContent: string): BoxerReply | null => {
+    const boxerPopularity = Math.random() * 100;
+    const myPopularity = fighter.popularity;
+    
+    // Higher chance of reply if fighter is popular or if the boxer is less popular
+    const shouldReply = Math.random() < (myPopularity / 100) * 0.4;
+    
+    if (!shouldReply) return null;
+
+    const replyTypes = ["reply", "shun", "follower_defend"];
+    const replyType = replyTypes[Math.floor(Math.random() * replyTypes.length)];
+    
+    const replies = {
+      reply: [
+        `You need to prove yourself first, ${fighter.name}. Talk is cheap! 🥊`,
+        `Respect the game, young fighter. You're not ready for this level yet! 💯`,
+        `I like the confidence, but let's see you in the ring first! 👑`,
+        `Keep training and maybe one day you'll earn a shot! 🔥`
+      ],
+      shun: [
+        `Who is this ${fighter.name}? Never heard of you! 😂`,
+        `You're not even on my radar. Come back when you're relevant! 👻`,
+        `My team doesn't even know who you are! 🤷‍♂️`,
+        `Blocked. Don't @ me until you're somebody! 🚫`
+      ],
+      follower_defend: [
+        `@${fighter.name} needs to stay in their lane! ${taggedBoxer} is the real champion! 👑`,
+        `This ${fighter.name} is just looking for clout! ${taggedBoxer} would destroy them! 💪`,
+        `${taggedBoxer} fans don't play! @${fighter.name} better watch their mouth! 🔥`,
+        `${fighter.name} couldn't last one round with the champ ${taggedBoxer}! 😤`
+      ]
+    };
+
+    return {
+      boxer: replyType === "follower_defend" ? `${taggedBoxer} Fan` : taggedBoxer,
+      message: replies[replyType as keyof typeof replies][Math.floor(Math.random() * replies[replyType as keyof typeof replies].length)],
+      type: replyType as "reply" | "shun" | "follower_defend",
+      timestamp: new Date()
+    };
+  };
 
   const handlePost = () => {
     if (!newPost.trim()) {
@@ -46,24 +99,52 @@ const MediaInterface = ({ fighter, onBack }: MediaInterfaceProps) => {
       return;
     }
 
+    const baseEngagement = Math.floor(fighter.popularity * 10);
+    const likes = baseEngagement + Math.floor(Math.random() * baseEngagement);
+    const comments = Math.floor(likes * 0.1) + Math.floor(Math.random() * 50);
+    const shares = Math.floor(likes * 0.05) + Math.floor(Math.random() * 20);
+
+    // Check for tagged boxers and generate replies
+    const taggedBoxers = realBoxers.filter(boxer => 
+      newPost.toLowerCase().includes(`@${boxer.replace(" ", "").toLowerCase()}`)
+    );
+
+    const replies: BoxerReply[] = [];
+    taggedBoxers.forEach(boxer => {
+      const reply = generateBoxerReply(boxer, newPost);
+      if (reply) replies.push(reply);
+    });
+
     const post: SocialPost = {
       id: Date.now().toString(),
       platform: activeTab,
       content: newPost,
-      likes: Math.floor(Math.random() * fighter.popularity * 10),
-      comments: Math.floor(Math.random() * fighter.popularity * 2),
-      shares: Math.floor(Math.random() * fighter.popularity),
+      likes,
+      comments,
+      shares,
       timestamp: new Date(),
-      hashtags: hashtags.split(",").map(tag => tag.trim()).filter(tag => tag)
+      hashtags: hashtags.split(",").map(tag => tag.trim()).filter(tag => tag),
+      replies
     };
 
     setPosts(prev => [post, ...prev]);
     setNewPost("");
     setHashtags("");
 
+    // Update social media stats
+    const newSocialData = {
+      followers: fighter.socialMedia.followers + Math.floor(likes * 0.01),
+      totalPosts: fighter.socialMedia.totalPosts + 1,
+      totalLikes: fighter.socialMedia.totalLikes + likes,
+      totalComments: fighter.socialMedia.totalComments + comments,
+      totalShares: fighter.socialMedia.totalShares + shares
+    };
+
+    onUpdateSocialMedia(newSocialData);
+
     toast({
       title: "Posted Successfully!",
-      description: `Your ${activeTab} post is now live!`,
+      description: `Your ${activeTab} post is now live! ${replies.length > 0 ? `${replies.length} boxer(s) responded!` : ''}`,
     });
   };
 
@@ -99,6 +180,33 @@ const MediaInterface = ({ fighter, onBack }: MediaInterfaceProps) => {
               <p className="text-muted-foreground">Build your fanbase and call out opponents</p>
             </div>
             <div className="w-24"></div>
+          </div>
+        </Card>
+
+        {/* Social Media Stats */}
+        <Card className="p-6 bg-card border-boxing-red">
+          <h3 className="text-lg font-bold text-boxing-gold mb-4">Your Social Media Stats</h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold text-boxing-gold">{fighter.socialMedia.followers.toLocaleString()}</div>
+              <div className="text-sm text-muted-foreground">Followers</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-boxing-gold">{fighter.socialMedia.totalPosts}</div>
+              <div className="text-sm text-muted-foreground">Posts</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-boxing-gold">{fighter.socialMedia.totalLikes.toLocaleString()}</div>
+              <div className="text-sm text-muted-foreground">Total Likes</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-boxing-gold">{fighter.socialMedia.totalComments.toLocaleString()}</div>
+              <div className="text-sm text-muted-foreground">Total Comments</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-boxing-gold">{fighter.socialMedia.totalShares.toLocaleString()}</div>
+              <div className="text-sm text-muted-foreground">Total Shares</div>
+            </div>
           </div>
         </Card>
 
@@ -212,6 +320,29 @@ const MediaInterface = ({ fighter, onBack }: MediaInterfaceProps) => {
                       <span>{post.shares.toLocaleString()}</span>
                     </div>
                   </div>
+                  
+                  {/* Boxer Replies */}
+                  {post.replies && post.replies.length > 0 && (
+                    <div className="mt-4 p-3 bg-muted rounded-lg">
+                      <h4 className="font-semibold text-sm mb-2">Responses:</h4>
+                      {post.replies.map((reply, index) => (
+                        <div key={index} className="mb-2 text-sm">
+                          <div className="flex items-center gap-2">
+                            <Badge 
+                              variant={reply.type === "shun" ? "destructive" : reply.type === "follower_defend" ? "secondary" : "default"}
+                              className="text-xs"
+                            >
+                              {reply.boxer}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {reply.timestamp.toLocaleTimeString()}
+                            </span>
+                          </div>
+                          <p className="mt-1">{reply.message}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))
             )}

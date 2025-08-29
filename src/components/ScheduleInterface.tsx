@@ -80,7 +80,16 @@ const ScheduleInterface = ({ fighter, onBack, onStartFight }: ScheduleInterfaceP
       experience: 70,
       injuries: [],
       facialDamage: 0,
-      money: 80000
+      money: 80000,
+      energy: 100,
+      weeksSinceLastFight: 0,
+      socialMedia: {
+        followers: 650000,
+        totalPosts: 200,
+        totalLikes: 3250000,
+        totalComments: 325000,
+        totalShares: 162500
+      }
     },
     {
       name: "Tommy Iron Fist Sullivan",
@@ -97,7 +106,16 @@ const ScheduleInterface = ({ fighter, onBack, onStartFight }: ScheduleInterfaceP
       experience: 85,
       injuries: [],
       facialDamage: 0,
-      money: 150000
+      money: 150000,
+      energy: 100,
+      weeksSinceLastFight: 0,
+      socialMedia: {
+        followers: 820000,
+        totalPosts: 300,
+        totalLikes: 4100000,
+        totalComments: 410000,
+        totalShares: 205000
+      }
     },
     {
       name: "Aleksandr The Siberian Volkov",
@@ -114,7 +132,16 @@ const ScheduleInterface = ({ fighter, onBack, onStartFight }: ScheduleInterfaceP
       experience: 78,
       injuries: [],
       facialDamage: 0,
-      money: 120000
+      money: 120000,
+      energy: 100,
+      weeksSinceLastFight: 0,
+      socialMedia: {
+        followers: 750000,
+        totalPosts: 250,
+        totalLikes: 3750000,
+        totalComments: 375000,
+        totalShares: 187500
+      }
     },
     {
       name: "Carlos El Toro Mendez",
@@ -131,7 +158,16 @@ const ScheduleInterface = ({ fighter, onBack, onStartFight }: ScheduleInterfaceP
       experience: 80,
       injuries: [],
       facialDamage: 0,
-      money: 100000
+      money: 100000,
+      energy: 100,
+      weeksSinceLastFight: 0,
+      socialMedia: {
+        followers: 700000,
+        totalPosts: 180,
+        totalLikes: 3500000,
+        totalComments: 350000,
+        totalShares: 175000
+      }
     }
   ];
 
