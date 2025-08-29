@@ -12,6 +12,8 @@ import ScheduleInterface from "./ScheduleInterface";
 import MediaInterface from "./MediaInterface";
 import SettingsInterface from "./SettingsInterface";
 import StatsInterface from "./StatsInterface";
+import LoadingScreen from "./LoadingScreen";
+import RankingInterface from "./RankingInterface";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Sword, Dumbbell, Users, MessageSquare, Trophy, Calendar, Settings, Star, Briefcase, Newspaper, TrendingUp, Shield, SkipForward, Battery } from "lucide-react";
 
@@ -40,6 +42,9 @@ export interface Fighter {
     totalComments: number;
     totalShares: number;
   };
+  technique: number;
+  mental: number;
+  unrankedWins: number;
 }
 
 export interface Manager {
@@ -58,7 +63,7 @@ export interface FightChoice {
 
 const BoxingGame = () => {
   const { toast } = useToast();
-  const [gameState, setGameState] = useState<"registration" | "menu" | "career" | "fight" | "training" | "callout" | "schedule" | "media" | "contracts" | "settings" | "stats">("registration");
+  const [gameState, setGameState] = useState<"registration" | "loading" | "menu" | "career" | "fight" | "training" | "callout" | "schedule" | "media" | "contracts" | "settings" | "stats" | "rankings">("registration");
   const [fighter, setFighter] = useState<Fighter | null>(null);
   const [currentWeek, setCurrentWeek] = useState(1);
   const [incomingCallouts, setIncomingCallouts] = useState<Fighter[]>([]);
@@ -92,11 +97,19 @@ const BoxingGame = () => {
   const handleCreateFighter = (newFighter: Fighter) => {
     setFighter({
       ...newFighter,
+      // Set all physical stats to 50
+      power: 50,
+      speed: 50,
+      defense: 50,
+      stamina: 50,
+      technique: 50,
+      mental: 50,
       injuries: [],
       facialDamage: 0,
       money: 25000,
       energy: 100,
       weeksSinceLastFight: 0,
+      unrankedWins: 0,
       socialMedia: {
         followers: 100,
         totalPosts: 0,
@@ -105,7 +118,7 @@ const BoxingGame = () => {
         totalShares: 0
       }
     });
-    setGameState("menu");
+    setGameState("loading");
   };
 
   const generateOpponent = (): Fighter => {
@@ -130,12 +143,15 @@ const BoxingGame = () => {
       popularity: 20 + Math.random() * 60,
       stamina: 100,
       ...baseStats,
+      technique: 40 + Math.random() * 30,
+      mental: 40 + Math.random() * 30,
       experience: Math.floor(Math.random() * 50),
       injuries: [],
       facialDamage: 0,
       money: 10000,
       energy: 100,
       weeksSinceLastFight: 0,
+      unrankedWins: Math.floor(Math.random() * 3),
       socialMedia: {
         followers: Math.floor(Math.random() * 1000),
         totalPosts: 0,
@@ -274,6 +290,30 @@ const BoxingGame = () => {
     }
   };
 
+  const updateSocialMediaAfterFight = (won: boolean, opponent: Fighter) => {
+    if (!fighter) return;
+    
+    const baseFollowerGain = won ? Math.floor(50 + Math.random() * 100) : Math.floor(10 + Math.random() * 30);
+    const popularityMultiplier = fighter.popularity / 100;
+    const opponentQualityMultiplier = (opponent.wins + opponent.popularity) / 100;
+    
+    const followerGain = Math.floor(baseFollowerGain * popularityMultiplier * opponentQualityMultiplier);
+    const likesGain = Math.floor(followerGain * (2 + Math.random() * 3));
+    const commentsGain = Math.floor(followerGain * (0.1 + Math.random() * 0.2));
+    const sharesGain = Math.floor(followerGain * (0.05 + Math.random() * 0.1));
+    
+    setFighter(prev => prev ? ({
+      ...prev,
+      socialMedia: {
+        followers: prev.socialMedia.followers + followerGain,
+        totalPosts: prev.socialMedia.totalPosts + 1,
+        totalLikes: prev.socialMedia.totalLikes + likesGain,
+        totalComments: prev.socialMedia.totalComments + commentsGain,
+        totalShares: prev.socialMedia.totalShares + sharesGain
+      }
+    }) : null);
+  };
+
   const endFight = (won: boolean) => {
     if (!fighter || !currentFight) return;
     
@@ -283,14 +323,21 @@ const BoxingGame = () => {
       const experienceGain = Math.max(5, 10 - Math.floor(fighter.wins / 5)); // Diminishing experience
       const popularityGain = Math.max(2, 8 - Math.floor(fighter.popularity / 20));
       
+      // Check if this is an unranked opponent
+      const isUnrankedOpponent = currentFight.opponent.wins < 5;
+      
       setFighter(prev => prev ? ({
         ...prev,
         wins: prev.wins + 1,
+        unrankedWins: isUnrankedOpponent ? prev.unrankedWins + 1 : prev.unrankedWins,
         experience: prev.experience + experienceGain,
         popularity: Math.min(100, prev.popularity + popularityGain),
         stamina: 100,
         weeksSinceLastFight: 0
       }) : null);
+      
+      // Update social media based on fight result
+      updateSocialMediaAfterFight(true, currentFight.opponent);
       
       toast({
         title: "VICTORY!",
@@ -304,6 +351,9 @@ const BoxingGame = () => {
         stamina: 100,
         weeksSinceLastFight: 0
       }) : null);
+      
+      // Update social media based on fight result
+      updateSocialMediaAfterFight(false, currentFight.opponent);
       
       toast({
         title: "DEFEAT",
@@ -327,16 +377,21 @@ const BoxingGame = () => {
       return;
     }
     
-    // Much slower progression - 1-3 points with diminishing returns
-    const baseImprovement = 1 + Math.floor(Math.random() * 3);
+    // Much slower progression - 0.5-1.5 points with heavy diminishing returns
+    const baseImprovement = 0.5 + Math.random();
     const currentStat = stat === "power" ? fighter.power : 
                        stat === "speed" ? fighter.speed :
                        stat === "defense" ? fighter.defense :
-                       stat === "stamina" ? fighter.stamina : 50;
+                       stat === "stamina" ? fighter.stamina :
+                       stat === "technique" ? fighter.technique :
+                       stat === "mental" ? fighter.mental : 50;
     
-    // Diminishing returns - harder to improve when stats are high
-    const difficultyModifier = currentStat > 80 ? 0.5 : currentStat > 60 ? 0.75 : 1;
-    const improvement = Math.max(1, Math.floor(baseImprovement * difficultyModifier));
+    // Heavy diminishing returns - much harder to improve when stats are high
+    const difficultyModifier = currentStat > 90 ? 0.1 : 
+                              currentStat > 80 ? 0.3 : 
+                              currentStat > 70 ? 0.5 : 
+                              currentStat > 60 ? 0.7 : 1;
+    const improvement = Math.max(0.1, baseImprovement * difficultyModifier);
     
     setFighter(prev => {
       if (!prev) return null;
@@ -360,8 +415,10 @@ const BoxingGame = () => {
           updates.stamina = Math.min(100, prev.stamina + improvement);
           break;
         case "technique":
+          updates.technique = Math.min(100, prev.technique + improvement);
+          break;
         case "mental":
-          updates.experience = prev.experience + improvement;
+          updates.mental = Math.min(100, prev.mental + improvement);
           break;
       }
       
@@ -370,7 +427,7 @@ const BoxingGame = () => {
     
     toast({
       title: "Training Complete",
-      description: `${stat.charAt(0).toUpperCase() + stat.slice(1)} improved by ${improvement} points! Energy decreased.`,
+      description: `${stat.charAt(0).toUpperCase() + stat.slice(1)} improved by ${improvement.toFixed(1)} points! Energy decreased.`,
     });
   };
 
@@ -435,6 +492,10 @@ const BoxingGame = () => {
 
   if (gameState === "registration") {
     return <RegistrationForm onCreateFighter={handleCreateFighter} />;
+  }
+
+  if (gameState === "loading") {
+    return <LoadingScreen onLoadingComplete={() => setGameState("menu")} />;
   }
 
   if (!fighter) {
@@ -583,6 +644,30 @@ const BoxingGame = () => {
     );
   }
 
+  if (gameState === "rankings") {
+    return (
+      <RankingInterface
+        fighter={fighter}
+        onBack={() => setGameState("career")}
+        onChallengeFighter={(opponent) => {
+          setCurrentFight({
+            opponent,
+            round: 1,
+            playerScore: 0,
+            opponentScore: 0,
+            commentary: [`This is a huge ranking fight! ${fighter.name} challenges ${opponent.name} for a chance to climb the rankings!`],
+            crowdMood: "electric",
+            playerInjuries: [],
+            opponentInjuries: [],
+            playerFacialDamage: 0,
+            opponentFacialDamage: 0
+          });
+          setGameState("fight");
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-ring relative">
       {/* Next Week Button - Top of Dashboard */}
@@ -660,7 +745,9 @@ const BoxingGame = () => {
                 { name: "Power", value: fighter.power, color: "text-red-500" },
                 { name: "Speed", value: fighter.speed, color: "text-yellow-500" },
                 { name: "Defense", value: fighter.defense, color: "text-blue-500" },
-                { name: "Experience", value: fighter.experience, color: "text-purple-500" }
+                { name: "Technique", value: fighter.technique, color: "text-green-500" },
+                { name: "Mental", value: fighter.mental, color: "text-purple-500" },
+                { name: "Experience", value: fighter.experience, color: "text-orange-500" }
               ].map((stat) => (
                 <div key={stat.name} className="text-center">
                   <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
@@ -782,6 +869,7 @@ const BoxingGame = () => {
             </Button>
             
             <Button 
+              onClick={() => setGameState("rankings")}
               className="h-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center"
               title="Rankings"
             >
