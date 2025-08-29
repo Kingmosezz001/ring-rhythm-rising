@@ -68,6 +68,9 @@ const BoxingGame = () => {
   const [currentWeek, setCurrentWeek] = useState(1);
   const [incomingCallouts, setIncomingCallouts] = useState<Fighter[]>([]);
   const [isAdvancingWeek, setIsAdvancingWeek] = useState(false);
+  const [wonBelts, setWonBelts] = useState<string[]>([]);
+  const [managerOffers, setManagerOffers] = useState<{type: string, message: string, id: string}[]>([]);
+  const [crowdReactions, setCrowdReactions] = useState<string[]>([]);
 
   const [manager] = useState<Manager>({
     name: "Tony Martinez",
@@ -701,62 +704,99 @@ const BoxingGame = () => {
       )}
 
       {/* Scrollable Main Content */}
+      {/* Save Button */}
+      <Button 
+        className="fixed top-4 left-4 z-50 bg-boxing-gold text-boxing-dark hover:bg-boxing-gold/80"
+        onClick={() => toast({title: "Game Saved", description: "Your progress has been saved!"})}
+      >
+        <Battery className="h-4 w-4" />
+      </Button>
+
       <div className="pb-20 p-4 overflow-y-auto">
-        <div className="max-w-6xl mx-auto space-y-6 pt-16">
-          {/* Boxer Avatar & Profile Header */}
-          <Card className="p-8 bg-card border-boxing-red shadow-champion">
-            <div className="flex flex-col items-center text-center space-y-4">
-              <Avatar className="h-20 w-20 border-2 border-boxing-gold shadow-boxer">
-                <AvatarImage src="/placeholder.svg" alt={fighter.name} />
-                <AvatarFallback className="bg-gradient-champion text-boxing-dark text-lg font-bold">
-                  {fighter.name.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div>
-                <h1 className="text-2xl font-bold text-boxing-gold mb-1">{fighter.name}</h1>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="font-medium">{fighter.age}yo</span>
-                  <span className="font-medium">{fighter.division}</span>
-                  <div className="flex items-center gap-1">
-                    <Trophy className="h-3 w-3 text-boxing-gold" />
-                    <span className="font-bold text-xs">{fighter.wins}-{fighter.losses} ({fighter.ko} KO)</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-center gap-3 mt-1">
-                  <div className="flex items-center gap-1">
-                    <Star className="h-3 w-3 text-boxing-gold" />
-                    <span className="font-medium text-xs">Pop: {fighter.popularity}%</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Battery className={`h-3 w-3 ${fighter.energy > 70 ? 'text-green-500' : fighter.energy > 30 ? 'text-yellow-500' : 'text-red-500'}`} />
-                    <span className="font-medium text-xs">Energy: {fighter.energy}%</span>
-                  </div>
-                </div>
+        <div className="max-w-6xl mx-auto space-y-4 pt-16">
+          {/* Fighter Info */}
+        <Card className="p-4 bg-card border-boxing-red">
+          <div className="flex items-center gap-3 mb-4">
+            <Avatar className="h-12 w-12">
+              <AvatarImage src="/placeholder.svg" alt={fighter.name} />
+              <AvatarFallback className="bg-gradient-champion text-boxing-dark text-sm">
+                {fighter.name.split(' ').map(n => n[0]).join('')}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-boxing-gold">{fighter.name}</h1>
+              <p className="text-sm text-muted-foreground">{fighter.division} Division</p>
+              <div className="flex gap-2 mt-1">
+                <Badge className="bg-gradient-champion text-boxing-dark text-xs px-2 py-1">
+                  {fighter.wins}-{fighter.losses} ({fighter.ko} KO)
+                </Badge>
+                <Badge variant="outline" className="border-boxing-gold text-boxing-gold text-xs px-2 py-1">
+                  Week {currentWeek}
+                </Badge>
               </div>
             </div>
-          </Card>
+          </div>
 
-          {/* Stats Overview */}
-          <Card className="p-3 bg-card border-boxing-red">
-            <h3 className="text-sm font-bold text-boxing-gold mb-2">Fighter Stats</h3>
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-              {[
-                { name: "Power", value: fighter.power, color: "text-red-500" },
-                { name: "Speed", value: fighter.speed, color: "text-yellow-500" },
-                { name: "Defense", value: fighter.defense, color: "text-blue-500" },
-                { name: "Technique", value: fighter.technique, color: "text-green-500" },
-                { name: "Mental", value: fighter.mental, color: "text-purple-500" },
-                { name: "Experience", value: fighter.experience, color: "text-orange-500" }
-              ].map((stat) => (
-                <div key={stat.name} className="text-center">
-                  <p className={`text-lg font-bold ${stat.color}`}>{Math.round(stat.value)}</p>
-                  <p className="text-xs text-muted-foreground">{stat.name}</p>
-                  <Progress value={stat.value} className="h-1 mt-1" />
-                </div>
+          {/* Won Belts */}
+          {wonBelts.length > 0 && (
+            <div className="mb-4">
+              <h3 className="text-sm font-bold text-boxing-gold mb-2">Championship Belts</h3>
+              <div className="flex flex-wrap gap-2">
+                {wonBelts.map((belt, index) => (
+                  <Badge key={index} className="bg-yellow-500 text-black text-xs px-2 py-1">
+                    🏆 {belt}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Manager Messages */}
+          {managerOffers.length > 0 && (
+            <div className="mb-4 p-3 bg-muted rounded border-l-4 border-boxing-gold">
+              <h3 className="text-sm font-bold text-boxing-gold mb-2">Manager Update</h3>
+              {managerOffers.map((offer, index) => (
+                <p key={index} className="text-xs text-muted-foreground mb-1">
+                  💼 {offer.message}
+                </p>
               ))}
             </div>
-          </Card>
+          )}
+        </Card>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="text-center">
+              <div className="text-lg font-bold text-boxing-gold">{fighter.power}</div>
+              <div className="text-xs text-muted-foreground">Power</div>
+              <Progress value={fighter.power} className="h-1 mt-1" />
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-boxing-gold">{fighter.speed}</div>
+              <div className="text-xs text-muted-foreground">Speed</div>
+              <Progress value={fighter.speed} className="h-1 mt-1" />
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-boxing-gold">{fighter.defense}</div>
+              <div className="text-xs text-muted-foreground">Defense</div>
+              <Progress value={fighter.defense} className="h-1 mt-1" />
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-boxing-gold">{fighter.stamina}</div>
+              <div className="text-xs text-muted-foreground">Stamina</div>
+              <Progress value={fighter.stamina} className="h-1 mt-1" />
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-boxing-gold">{fighter.technique}</div>
+              <div className="text-xs text-muted-foreground">Technique</div>
+              <Progress value={fighter.technique} className="h-1 mt-1" />
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-boxing-gold">{fighter.mental}</div>
+              <div className="text-xs text-muted-foreground">Mental</div>
+              <Progress value={fighter.mental} className="h-1 mt-1" />
+            </div>
+          </div>
 
           {/* Manager Advice */}
           <Card className="p-3 bg-card border-boxing-red">
@@ -804,94 +844,107 @@ const BoxingGame = () => {
               </div>
             </div>
           </Card>
-        </div>
-      </div>
 
-      {/* Fixed Floating Action Buttons - Horizontal Scrollable */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-boxing-red p-2 z-40">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
-            <Button 
-              onClick={startFightCheck}
-              className="h-16 min-w-16 bg-gradient-danger hover:scale-105 transition-transform flex items-center justify-center flex-shrink-0"
-              title="Quick Fight"
-            >
-              <Sword className="h-6 w-6" />
-            </Button>
-            
-            <Button 
-              onClick={() => setGameState("schedule")}
-              className="h-16 min-w-16 bg-gradient-champion text-boxing-dark hover:scale-105 transition-transform flex items-center justify-center flex-shrink-0"
-              title="Schedule"
-            >
-              <Calendar className="h-6 w-6" />
-            </Button>
-            
-            <Button 
-              onClick={() => setGameState("training")}
-              className="h-16 min-w-16 bg-secondary hover:scale-105 transition-transform flex items-center justify-center flex-shrink-0"
-              title="Training"
-            >
-              <Dumbbell className="h-6 w-6" />
-            </Button>
-            
-            <Button 
-              onClick={() => setGameState("callout")}
-              className="h-16 min-w-16 bg-accent text-accent-foreground hover:scale-105 transition-transform flex items-center justify-center flex-shrink-0"
-              title="Call Out"
-            >
-              <MessageSquare className="h-6 w-6" />
-            </Button>
+      {/* Career Actions - Horizontal Scroll */}
+        <Card className="p-3 bg-card border-boxing-red">
+          <h3 className="text-sm font-bold text-boxing-gold mb-3">Career Actions</h3>
+          <div className="overflow-x-auto">
+            <div className="flex gap-3 min-w-max pb-2">
+              <Button
+                onClick={startFightCheck}
+                className="h-16 min-w-[120px] bg-gradient-danger text-white hover:scale-105 transition-transform flex-col gap-1"
+              >
+                <Sword className="h-5 w-5" />
+                <span className="text-xs">Fight</span>
+              </Button>
+              
+              <Button
+                onClick={() => setGameState("training")}
+                className="h-16 min-w-[120px] bg-gradient-champion text-boxing-dark hover:scale-105 transition-transform flex-col gap-1"
+              >
+                <Dumbbell className="h-5 w-5" />
+                <span className="text-xs">Training</span>
+              </Button>
+              
+              <Button
+                onClick={() => setGameState("callout")}
+                className="h-16 min-w-[120px] bg-gradient-subtle hover:scale-105 transition-transform flex-col gap-1"
+              >
+                <Users className="h-4 w-4" />
+                <span className="text-xs">Callouts</span>
+              </Button>
+              
+              <Button
+                onClick={() => setGameState("schedule")}
+                className="h-16 min-w-[120px] bg-gradient-subtle hover:scale-105 transition-transform flex-col gap-1"
+              >
+                <Calendar className="h-4 w-4" />
+                <span className="text-xs">Schedule</span>
+              </Button>
+              
+              <Button
+                onClick={() => setGameState("media")}
+                className="h-16 min-w-[120px] bg-gradient-subtle hover:scale-105 transition-transform flex-col gap-1"
+              >
+                <MessageSquare className="h-4 w-4" />
+                <span className="text-xs">Media</span>
+              </Button>
+              
+              <Button
+                onClick={() => setGameState("rankings")}
+                className="h-16 min-w-[120px] bg-gradient-subtle hover:scale-105 transition-transform flex-col gap-1"
+              >
+                <Trophy className="h-4 w-4" />
+                <span className="text-xs">Rankings</span>
+              </Button>
+              
+              <Button
+                onClick={() => setGameState("contracts")}
+                className="h-16 min-w-[120px] bg-gradient-subtle hover:scale-105 transition-transform flex-col gap-1"
+              >
+                <Briefcase className="h-4 w-4" />
+                <span className="text-xs">Contracts</span>
+              </Button>
+              
+              <Button
+                onClick={() => setGameState("stats")}
+                className="h-16 min-w-[120px] bg-gradient-subtle hover:scale-105 transition-transform flex-col gap-1"
+              >
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-xs">Stats</span>
+              </Button>
+              
+              <Button
+                onClick={() => setGameState("settings")}
+                className="h-16 min-w-[120px] bg-gradient-subtle hover:scale-105 transition-transform flex-col gap-1"
+              >
+                <Settings className="h-4 w-4" />
+                <span className="text-xs">Settings</span>
+              </Button>
+            </div>
+          </div>
+        </Card>
 
-            <Button 
-              onClick={() => setGameState("media")}
-              className="h-16 min-w-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center flex-shrink-0"
-              title="Media"
+        {/* Week Actions */}
+        <Card className="p-4 bg-card border-boxing-red">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-boxing-gold">Week {currentWeek}</h3>
+              <p className="text-xs text-muted-foreground">Choose your actions</p>
+            </div>
+            <Button
+              onClick={advanceWeek}
+              disabled={isAdvancingWeek}
+              className="bg-gradient-champion text-boxing-dark hover:scale-105 transition-transform text-sm px-3 py-2"
             >
-              <Newspaper className="h-6 w-6" />
-            </Button>
-            
-            <Button 
-              onClick={() => setGameState("contracts")}
-              className="h-16 min-w-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center flex-shrink-0"
-              title="Contracts"
-            >
-              <Briefcase className="h-6 w-6" />
-            </Button>
-            
-            <Button 
-              className="h-16 min-w-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center flex-shrink-0"
-              title="Team"
-            >
-              <Users className="h-6 w-6" />
-            </Button>
-            
-            <Button 
-              onClick={() => setGameState("rankings")}
-              className="h-16 min-w-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center flex-shrink-0"
-              title="Rankings"
-            >
-              <Trophy className="h-6 w-6" />
-            </Button>
-            
-            <Button 
-              onClick={() => setGameState("stats")}
-              className="h-16 min-w-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center flex-shrink-0"
-              title="Stats"
-            >
-              <TrendingUp className="h-6 w-6" />
-            </Button>
-            
-            <Button 
-              onClick={() => setGameState("settings")}
-              className="h-16 min-w-16 bg-muted hover:scale-105 transition-transform flex items-center justify-center flex-shrink-0"
-              title="Settings"
-            >
-              <Settings className="h-6 w-6" />
+              <SkipForward className="h-3 w-3 mr-1" />
+              {isAdvancingWeek ? "Advancing..." : "Next Week"}
             </Button>
           </div>
+        </Card>
         </div>
       </div>
+
     </div>
   );
 };

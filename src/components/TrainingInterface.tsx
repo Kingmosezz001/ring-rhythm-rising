@@ -75,7 +75,33 @@ const TrainingInterface = ({ fighter, onTrainStat, onBack }: TrainingInterfacePr
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
-          <h1 className="text-3xl font-bold text-boxing-gold">Training Facility</h1>
+          <h1 className="text-2xl font-bold text-boxing-gold">Training Facility</h1>
+          
+          {/* Training Equipment and Facilities */}
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="p-4 bg-muted border-boxing-gold">
+              <h3 className="text-sm font-bold text-boxing-gold mb-2">Equipment Available</h3>
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p>🥊 Heavy Bags - Power Training</p>
+                <p>⚡ Speed Bags - Hand-Eye Coordination</p>
+                <p>🛡️ Defensive Mitts - Blocking & Slipping</p>
+                <p>❤️ Cardio Equipment - Endurance</p>
+                <p>🎯 Precision Pads - Technique</p>
+                <p>🧠 Mental Coaching - Ring IQ</p>
+              </div>
+            </Card>
+            
+            <Card className="p-4 bg-muted border-boxing-gold">
+              <h3 className="text-sm font-bold text-boxing-gold mb-2">Training Schedule</h3>
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p>📅 Monday-Friday: Main Training</p>
+                <p>⚡ Saturday: Light Technical Work</p>
+                <p>💤 Sunday: Rest & Recovery</p>
+                <p>⚠️ Training costs energy - manage wisely</p>
+                <p>🎯 Focus on weak areas for best results</p>
+              </div>
+            </Card>
+          </div>
         </div>
 
         <Card className="p-6 bg-card border-boxing-red">

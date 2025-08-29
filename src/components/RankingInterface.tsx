@@ -219,7 +219,11 @@ const RankingInterface = ({ fighter, onBack, onChallengeFighter }: RankingInterf
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-semibold">{rankedFighter.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold">{rankedFighter.name}</p>
+                          {rankedFighter.isChampion && <span className="text-yellow-400">🏆</span>}
+                          {rankedFighter.belt && !rankedFighter.isChampion && <span className="text-amber-500">🥇</span>}
+                        </div>
                         <p className="text-xs text-muted-foreground">Age {rankedFighter.age}</p>
                       </div>
                     </div>
