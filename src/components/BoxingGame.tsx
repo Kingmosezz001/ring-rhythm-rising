@@ -336,7 +336,7 @@ const BoxingGame = () => {
         experience: prev.experience + experienceGain,
         popularity: Math.min(100, prev.popularity + popularityGain),
         stamina: 100,
-        weeksSinceLastFight: 0
+        weeksSinceLastFight: Math.floor(Math.random() * 4) // 0-3 weeks, need 4-7 total
       }) : null);
       
       // Update social media based on fight result
@@ -352,11 +352,19 @@ const BoxingGame = () => {
         losses: prev.losses + 1,
         experience: prev.experience + 2, // Less experience from losses
         stamina: 100,
-        weeksSinceLastFight: 0
+        weeksSinceLastFight: Math.floor(Math.random() * 4) // 0-3 weeks, need 4-7 total
       }) : null);
       
       // Update social media based on fight result
       updateSocialMediaAfterFight(false, currentFight.opponent);
+      
+      // Add rematch option for losses
+      const rematchWeeks = 6 + Math.floor(Math.random() * 8); // 6-13 weeks for rematch
+      setManagerOffers(prev => [...prev, {
+        type: "rematch",
+        message: `Want a rematch with ${currentFight.opponent.name}? I can set it up for ${rematchWeeks} weeks from now.`,
+        id: `rematch_${Date.now()}`
+      }]);
       
       toast({
         title: "DEFEAT",
@@ -481,10 +489,11 @@ const BoxingGame = () => {
       return;
     }
     
-    if (fighter.weeksSinceLastFight < 2) {
+    if (fighter.weeksSinceLastFight < 4) {
+      const weeksToWait = 4 - fighter.weeksSinceLastFight;
       toast({
         title: "Too Soon to Fight",
-        description: "You need more recovery time between fights!",
+        description: `You need ${weeksToWait} more weeks to recover between fights! Current recovery: ${fighter.weeksSinceLastFight}/4 weeks`,
         variant: "destructive"
       });
       return;

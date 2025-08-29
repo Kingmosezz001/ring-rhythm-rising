@@ -38,28 +38,28 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
         text: "Throw a powerful uppercut",
         type: "aggressive" as const,
         staminaCost: 18,
-        successChance: 0.55
+        successChance: 0.5
       },
       {
         id: "B", 
         text: "Circle and jab",
         type: "tactical" as const,
         staminaCost: 10,
-        successChance: 0.7
+        successChance: 0.5
       },
       {
         id: "C",
         text: "Bob and weave defensively",
         type: "defensive" as const, 
         staminaCost: 7,
-        successChance: 0.75
+        successChance: 0.5
       },
       {
         id: "D",
         text: "Go for a knockout combo",
         type: "risky" as const,
         staminaCost: 25,
-        successChance: 0.35
+        successChance: 0.5
       }
     ];
 
@@ -69,28 +69,28 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
         text: "Body shot combination",
         type: "aggressive" as const,
         staminaCost: 16,
-        successChance: 0.6
+        successChance: 0.5
       },
       {
         id: "B",
         text: "Feint and cross",
         type: "tactical" as const,
         staminaCost: 12,
-        successChance: 0.65
+        successChance: 0.5
       },
       {
         id: "C",
         text: "Clinch and rest",
         type: "defensive" as const,
         staminaCost: 5,
-        successChance: 0.8
+        successChance: 0.5
       },
       {
         id: "D",
         text: "All-out blitz attack",
         type: "risky" as const,
         staminaCost: 22,
-        successChance: 0.4
+        successChance: 0.5
       }
     ];
 
@@ -100,28 +100,28 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
         text: "Conserve energy, light jabs",
         type: "tactical" as const,
         staminaCost: 8,
-        successChance: 0.6
+        successChance: 0.5
       },
       {
         id: "B",
         text: "Try to tie up opponent",
         type: "defensive" as const,
         staminaCost: 5,
-        successChance: 0.75
+        successChance: 0.5
       },
       {
         id: "C",
         text: "Desperate haymaker",
         type: "risky" as const,
         staminaCost: 15,
-        successChance: 0.3
+        successChance: 0.5
       },
       {
         id: "D",
         text: "Focus on footwork",
         type: "defensive" as const,
         staminaCost: 6,
-        successChance: 0.7
+        successChance: 0.5
       }
     ];
 
@@ -137,7 +137,29 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
   }, [currentFight.round, fighter.stamina]);
 
   const generateFightResult = (choice: FightChoice): string => {
-    const success = Math.random() < choice.successChance;
+    // Calculate success based on fighter stats and choice type
+    let baseSuccessChance = 0.5;
+    
+    switch (choice.type) {
+      case "aggressive":
+        baseSuccessChance = (fighter.power + fighter.speed) / 200 + 0.1;
+        break;
+      case "tactical":
+        baseSuccessChance = (fighter.technique + fighter.experience) / 200 + 0.2;
+        break;
+      case "defensive":
+        baseSuccessChance = (fighter.defense + fighter.experience) / 200 + 0.3;
+        break;
+      case "risky":
+        baseSuccessChance = fighter.power / 200 + 0.1;
+        break;
+    }
+    
+    // Factor in stamina
+    const staminaFactor = fighter.stamina / 100;
+    const finalSuccessChance = Math.min(0.9, baseSuccessChance * staminaFactor);
+    
+    const success = Math.random() < finalSuccessChance;
     
     // Dynamic intensity based on round and action type
     const roundIntensity = currentFight.round > 8 ? "extreme" : 
@@ -360,29 +382,29 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
         <Card className="p-6 bg-card border-boxing-red">
           <div className="flex justify-between items-center mb-4">
             <div className="text-center">
-              <h3 className="font-bold text-lg">{fighter.name}</h3>
-              <p className="text-sm text-muted-foreground">{fighter.wins}-{fighter.losses}</p>
+              <h3 className="font-bold text-sm">{fighter.name}</h3>
+              <p className="text-xs text-muted-foreground">{fighter.wins}-{fighter.losses}</p>
             </div>
             <div className="text-center">
-              <Badge className="bg-boxing-red text-white text-lg px-4 py-2">
+              <Badge className="bg-boxing-red text-white text-sm px-2 py-1">
                 ROUND {currentFight.round}
               </Badge>
             </div>
             <div className="text-center">
-              <h3 className="font-bold text-lg">{currentFight.opponent.name}</h3>
-              <p className="text-sm text-muted-foreground">{currentFight.opponent.wins}-{currentFight.opponent.losses}</p>
+              <h3 className="font-bold text-sm">{currentFight.opponent.name}</h3>
+              <p className="text-xs text-muted-foreground">{currentFight.opponent.wins}-{currentFight.opponent.losses}</p>
             </div>
           </div>
           
           {/* Score */}
-          <div className="flex justify-center space-x-8 mb-4">
+          <div className="flex justify-center space-x-8 mb-2">
             <div className="text-center">
-              <div className="text-3xl font-bold text-boxing-gold">{currentFight.playerScore}</div>
-              <div className="text-sm">YOU</div>
+              <div className="text-lg font-bold text-boxing-gold">{currentFight.playerScore}</div>
+              <div className="text-xs">YOU</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-boxing-gold">{currentFight.opponentScore}</div>
-              <div className="text-sm">OPPONENT</div>
+              <div className="text-lg font-bold text-boxing-gold">{currentFight.opponentScore}</div>
+              <div className="text-xs">OPPONENT</div>
             </div>
           </div>
 
@@ -417,7 +439,7 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
               <div className="font-bold text-lg">{choice.id}</div>
               <div className="text-sm">{choice.text}</div>
               <div className="text-xs opacity-75 mt-1">
-                Stamina: -{choice.staminaCost} | Success: {Math.round(choice.successChance * 100)}%
+                Stamina: -{choice.staminaCost}
               </div>
             </Button>
           ))}

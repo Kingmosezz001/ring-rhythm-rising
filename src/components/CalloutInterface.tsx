@@ -169,11 +169,11 @@ const CalloutInterface = ({ fighter, onBack, onStartFight }: CalloutInterfacePro
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
-          <h1 className="text-2xl font-bold text-boxing-gold">Call Out Fighters</h1>
+          <h1 className="text-lg font-bold text-boxing-gold">Call Out Fighters</h1>
           
           {/* Manager Advice */}
-          <Card className="p-4 bg-muted border-boxing-gold mt-4">
-            <h3 className="text-sm font-bold text-boxing-gold mb-2">Manager's Advice</h3>
+          <Card className="p-2 bg-muted border-boxing-gold mt-2">
+            <h3 className="text-xs font-bold text-boxing-gold mb-1">Manager's Advice</h3>
             <p className="text-xs text-muted-foreground">
               "Look for fighters close to your level. Don't bite off more than you can chew, but don't waste time with easy fights either. 
               Build your reputation step by step and the big names will start taking notice."
@@ -181,10 +181,10 @@ const CalloutInterface = ({ fighter, onBack, onStartFight }: CalloutInterfacePro
           </Card>
 
           {/* Current Callouts */}
-          <Card className="p-4 bg-card border-boxing-red mt-4">
-            <h3 className="text-sm font-bold text-boxing-gold mb-2">Fighters Calling You Out</h3>
-            <div className="space-y-2">
-              <div className="p-2 bg-muted rounded">
+          <Card className="p-2 bg-card border-boxing-red mt-2">
+            <h3 className="text-xs font-bold text-boxing-gold mb-1">Fighters Calling You Out</h3>
+            <div className="space-y-1">
+              <div className="p-1 bg-muted rounded">
                 <p className="text-xs font-semibold">Jake "The Snake" Williams</p>
                 <p className="text-xs text-muted-foreground">"That bum thinks he's ready for real competition? I'll show him what a real fighter looks like!"</p>
               </div>
@@ -193,8 +193,8 @@ const CalloutInterface = ({ fighter, onBack, onStartFight }: CalloutInterfacePro
         </div>
 
         {/* Division Selector */}
-        <Card className="p-6 bg-card border-boxing-red">
-          <h2 className="text-xl font-bold text-boxing-gold mb-4">Select Division</h2>
+        <Card className="p-3 bg-card border-boxing-red">
+          <h2 className="text-sm font-bold text-boxing-gold mb-2">Select Division</h2>
           <div className="flex flex-wrap gap-2">
             {divisions.map((division) => (
               <Button
@@ -213,8 +213,8 @@ const CalloutInterface = ({ fighter, onBack, onStartFight }: CalloutInterfacePro
         </Card>
 
         {/* Fighter List */}
-        <Card className="p-6 bg-card border-boxing-red">
-          <h2 className="text-xl font-bold text-boxing-gold mb-4">Available Fighters - {selectedDivision}</h2>
+        <Card className="p-3 bg-card border-boxing-red">
+          <h2 className="text-sm font-bold text-boxing-gold mb-2">Available Fighters - {selectedDivision}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {realBoxers[selectedDivision as keyof typeof realBoxers].map((boxer, index) => {
               const canCall = canCallOut(boxer);
@@ -230,7 +230,7 @@ const CalloutInterface = ({ fighter, onBack, onStartFight }: CalloutInterfacePro
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-bold text-boxing-gold text-lg">{boxer.name}</h3>
+                      <h3 className="font-bold text-boxing-gold text-sm">{boxer.name}</h3>
                       <Badge className={`${getDifficultyColor(boxer.difficulty)} bg-transparent border`}>
                         {boxer.difficulty}
                       </Badge>

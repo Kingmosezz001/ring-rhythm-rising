@@ -176,36 +176,36 @@ const MediaInterface = ({ fighter, onBack, onUpdateSocialMedia }: MediaInterface
               Back to Career
             </Button>
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-boxing-gold">SOCIAL MEDIA</h1>
-              <p className="text-muted-foreground">Build your fanbase and call out opponents</p>
+              <h1 className="text-lg font-bold text-boxing-gold">SOCIAL MEDIA</h1>
+              <p className="text-xs text-muted-foreground">Build your fanbase and call out opponents</p>
             </div>
             <div className="w-24"></div>
           </div>
         </Card>
 
         {/* Social Media Stats */}
-        <Card className="p-6 bg-card border-boxing-red">
-          <h3 className="text-lg font-bold text-boxing-gold mb-4">Your Social Media Stats</h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+        <Card className="p-3 bg-card border-boxing-red">
+          <h3 className="text-sm font-bold text-boxing-gold mb-2">Your Social Media Stats</h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-center">
             <div>
-              <div className="text-2xl font-bold text-boxing-gold">{fighter.socialMedia.followers.toLocaleString()}</div>
-              <div className="text-sm text-muted-foreground">Followers</div>
+              <div className="text-sm font-bold text-boxing-gold">{fighter.socialMedia.followers.toLocaleString()}</div>
+              <div className="text-xs text-muted-foreground">Followers</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-boxing-gold">{fighter.socialMedia.totalPosts}</div>
-              <div className="text-sm text-muted-foreground">Posts</div>
+              <div className="text-sm font-bold text-boxing-gold">{fighter.socialMedia.totalPosts}</div>
+              <div className="text-xs text-muted-foreground">Posts</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-boxing-gold">{fighter.socialMedia.totalLikes.toLocaleString()}</div>
-              <div className="text-sm text-muted-foreground">Total Likes</div>
+              <div className="text-sm font-bold text-boxing-gold">{fighter.socialMedia.totalLikes.toLocaleString()}</div>
+              <div className="text-xs text-muted-foreground">Total Likes</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-boxing-gold">{fighter.socialMedia.totalComments.toLocaleString()}</div>
-              <div className="text-sm text-muted-foreground">Total Comments</div>
+              <div className="text-sm font-bold text-boxing-gold">{fighter.socialMedia.totalComments.toLocaleString()}</div>
+              <div className="text-xs text-muted-foreground">Total Comments</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-boxing-gold">{fighter.socialMedia.totalShares.toLocaleString()}</div>
-              <div className="text-sm text-muted-foreground">Total Shares</div>
+              <div className="text-sm font-bold text-boxing-gold">{fighter.socialMedia.totalShares.toLocaleString()}</div>
+              <div className="text-xs text-muted-foreground">Total Shares</div>
             </div>
           </div>
         </Card>
@@ -222,8 +222,8 @@ const MediaInterface = ({ fighter, onBack, onUpdateSocialMedia }: MediaInterface
           >
             <div className="text-center space-y-3">
               <Video className="h-12 w-12 mx-auto text-pink-500" />
-              <h3 className="text-xl font-bold text-pink-500">TikTok</h3>
-              <p className="text-sm text-muted-foreground">Short video content platform</p>
+              <h3 className="text-sm font-bold text-pink-500">TikTok</h3>
+              <p className="text-xs text-muted-foreground">Short video content platform</p>
               <div className="bg-black rounded-lg p-3 text-white text-xs">
                 <div className="flex justify-between items-center mb-2">
                   <span>@{fighter.name.toLowerCase().replace(' ', '')}</span>
@@ -252,8 +252,8 @@ const MediaInterface = ({ fighter, onBack, onUpdateSocialMedia }: MediaInterface
           >
             <div className="text-center space-y-3">
               <Camera className="h-12 w-12 mx-auto text-purple-500" />
-              <h3 className="text-xl font-bold text-purple-500">Instagram</h3>
-              <p className="text-sm text-muted-foreground">Photo & story sharing platform</p>
+              <h3 className="text-sm font-bold text-purple-500">Instagram</h3>
+              <p className="text-xs text-muted-foreground">Photo & story sharing platform</p>
               <div className="bg-white border rounded-lg p-3 text-black text-xs">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -273,15 +273,15 @@ const MediaInterface = ({ fighter, onBack, onUpdateSocialMedia }: MediaInterface
         </div>
 
         {/* Platform Interface */}
-        <Card className="p-6 bg-card border-boxing-red">
-          <div className="mb-6">
-            <h3 className="text-2xl font-bold mb-2">
+        <Card className="p-3 bg-card border-boxing-red">
+          <div className="mb-3">
+            <h3 className="text-sm font-bold mb-1">
               <span className={activeTab === "tiktok" ? "text-pink-500" : "text-purple-500"}>
                 {activeTab === "tiktok" ? "TikTok" : "Instagram"}
               </span>
               <span className="text-boxing-gold"> Dashboard</span>
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {activeTab === "tiktok" 
                 ? "Create viral boxing content and call out opponents" 
                 : "Share your training photos and behind-the-scenes content"
@@ -295,7 +295,7 @@ const MediaInterface = ({ fighter, onBack, onUpdateSocialMedia }: MediaInterface
               ? "bg-gradient-to-r from-pink-500/10 to-purple-600/10 border border-pink-500/30" 
               : "bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30"
           } p-4 rounded-lg mb-6`}>
-            <h3 className="text-lg font-bold mb-4">
+            <h3 className="text-xs font-bold mb-2">
               <span className={activeTab === "tiktok" ? "text-pink-500" : "text-purple-500"}>
                 Create {activeTab === "tiktok" ? "TikTok Video" : "Instagram Post"}
               </span>
@@ -348,7 +348,7 @@ const MediaInterface = ({ fighter, onBack, onUpdateSocialMedia }: MediaInterface
 
           {/* Posts Feed */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold text-boxing-gold">Your Recent Posts</h3>
+            <h3 className="text-xs font-bold text-boxing-gold">Your Recent Posts</h3>
             {posts.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <p>No posts yet. Start building your social media presence!</p>
