@@ -136,6 +136,57 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
     setCurrentChoices(generateDynamicChoices());
   }, [currentFight.round, fighter.stamina]);
 
+  const generateCrowdReaction = (success: boolean, intensity: string, choiceType: string): string => {
+    const crowdReactions = {
+      success: {
+        extreme: [
+          "🔥 THE CROWD EXPLODES! 'OHHHHHHH!' echoes through the arena as 30,000 fans LOSE THEIR MINDS!",
+          "⚡ ARENA ROOF NEARLY BLOWN OFF! The deafening roar could wake the dead! 'FINISH HIM! FINISH HIM!'",
+          "💀 BLOODTHIRSTY CROWD GOES BERSERK! 'KILL! KILL! KILL!' reverberates through the stadium!",
+          "🌪️ TSUNAMI OF NOISE! Fans throwing beer, standing on chairs, absolute PANDEMONIUM!"
+        ],
+        high: [
+          "🔥 The crowd ERUPTS! 'WOOOOO!' 15,000 voices screaming in unison!",
+          "⚡ Stadium shaking! 'YES! YES! YES!' chanted by thousands!",
+          "💪 Fans on their feet! 'THAT'S HOW YOU DO IT!' someone screams!",
+          "🎯 'BEAUTIFUL! BEAUTIFUL!' the crowd roars in appreciation!"
+        ],
+        medium: [
+          "👏 Solid approval from the crowd! Applause mixed with excited chatter!",
+          "🙌 'Nice shot!' can be heard from ringside!",
+          "📣 Appreciative murmur ripples through the audience!",
+          "✨ 'Good boxing!' someone shouts from the balcony!"
+        ]
+      },
+      failure: {
+        extreme: [
+          "😱 CROWD GASPS IN HORROR! Pin-drop silence before explosive 'OHHHH NO!'",
+          "💔 30,000 hearts sink at once! 'GET UP! GET UP!' desperately screamed!",
+          "🚨 COLLECTIVE INTAKE OF BREATH! The arena falls deadly silent!",
+          "⚰️ Crowd holds its breath! 'NOOOOO!' echoes from every corner!"
+        ],
+        high: [
+          "😬 Crowd winces collectively! 'Ohhhhh!' ripples through the stands!",
+          "🤦‍♂️ 'Come on!' frustrated voices shout from all directions!",
+          "😤 'You got this!' supportive but concerned voices call out!",
+          "💥 'WAKE UP!' someone screams desperately!"
+        ],
+        medium: [
+          "😐 Mixed reactions from the crowd, some groaning softly",
+          "🤷‍♂️ 'Shake it off!' a loyal fan encourages",
+          "📢 Scattered 'Let's go!' chants trying to rally support",
+          "🙏 'Come on, focus!' ringside advice being shouted"
+        ]
+      }
+    };
+
+    const reactionType = success ? "success" : "failure";
+    const intensityLevel = intensity as keyof typeof crowdReactions.success;
+    const reactions = crowdReactions[reactionType][intensityLevel] || crowdReactions[reactionType].medium;
+    
+    return reactions[Math.floor(Math.random() * reactions.length)];
+  };
+
   const generateFightResult = (choice: FightChoice): string => {
     // Calculate success based on fighter stats and choice type
     let baseSuccessChance = 0.5;
@@ -168,21 +219,24 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
     setFightIntensity(roundIntensity);
     
     const opponentActions = [
-      "throws a vicious counter left hook",
-      "tries to clinch and rough you up inside", 
-      "backs away and circles, looking for an opening",
-      "digs a hard body shot to your ribs",
-      "comes up with a crushing uppercut",
-      "feints and moves laterally, setting traps",
-      "unleashes a brutal combination",
-      "steps in with a devastating right cross",
-      "works the body with punishing shots",
-      "ties you up and leans on you heavily",
-      "pivots and throws a sneaky left hook",
-      "pressures forward with bad intentions"
+      "EXPLODES with a bone-crushing counter left hook that could decapitate a horse",
+      "MAULS you in the clinch, throwing vicious elbows and grinding his forearm into your throat", 
+      "retreats like a wounded predator, eyes blazing with murderous intent",
+      "DEMOLISHES your ribs with a body shot that feels like a sledgehammer",
+      "LAUNCHES a catastrophic uppercut that could launch you into orbit",
+      "stalks you like death itself, setting deadly traps with surgical precision",
+      "UNLEASHES HELL with a combination that sounds like machine gun fire",
+      "DETONATES a right cross that shakes the entire arena",
+      "BRUTALIZES your body with shots that feel like sledgehammers to concrete",
+      "suffocates you in the clinch, using his weight like a python crushing its prey",
+      "pivots and BOMBS you with a left hook from the gates of hell",
+      "advances like a rabid animal with blood in his eyes and murder on his mind"
     ];
     
     const opponentAction = opponentActions[Math.floor(Math.random() * opponentActions.length)];
+    
+    // Generate crowd reaction
+    const crowdReaction = generateCrowdReaction(success, roundIntensity, choice.type);
     
     // Generate facial expressions and injuries
     const playerExpression = generateFacialExpression(success, choice.type, fighter.stamina);
@@ -192,56 +246,56 @@ const FightInterface = ({ fighter, currentFight, onFightChoice, onEndFight }: Fi
     if (success) {
       const successResults = {
         aggressive: [
-          `BANG! You land a devastating shot that rocks your opponent to his core! ${playerExpression} Your opponent ${opponentAction} - too little, too late! ${opponentExpression} The crowd is going WILD! ${injuryResult}`,
-          `What a BOMB! Your power shot finds the target perfectly! ${playerExpression} Your opponent ${opponentAction} but he's clearly hurt! ${opponentExpression} He's in survival mode now! ${injuryResult}`,
-          `THUNDEROUS impact! You connect with authority and your opponent's legs wobble! ${playerExpression} He desperately ${opponentAction} but the damage is done! ${opponentExpression} ${injuryResult}`,
-          `CRUSHING blow lands flush! Your opponent's mouthpiece flies out as he ${opponentAction} trying to recover! ${playerExpression} ${opponentExpression} This could be the beginning of the end! ${injuryResult}`
+          `💥 NUCLEAR BOMB! Your fist DETONATES against his skull like a wrecking ball through glass! ${playerExpression} Blood and spit spray everywhere as your opponent ${opponentAction} - but he's SHATTERED! ${opponentExpression} ${crowdReaction} His legs turn to jelly! ${injuryResult}`,
+          `⚡ LIGHTNING STRIKE! Your shot EXPLODES with the fury of Thor's hammer! ${playerExpression} Your opponent's eyes roll back as he ${opponentAction} but he's BROKEN! ${opponentExpression} ${crowdReaction} His soul left his body! ${injuryResult}`,
+          `🔥 APOCALYPTIC IMPACT! You connect with the force of a freight train hitting a brick wall! ${playerExpression} Your opponent ${opponentAction} like a dying animal, but it's TOO LATE! ${opponentExpression} ${crowdReaction} The damage is CATASTROPHIC! ${injuryResult}`,
+          `💀 DEATH BLOW! Your fist finds its mark with surgical brutality! Mouthpiece flies into the crowd as he ${opponentAction} desperately! ${playerExpression} ${opponentExpression} ${crowdReaction} THIS COULD BE MURDER! ${injuryResult}`
         ],
         tactical: [
-          `Textbook boxing! You execute the perfect game plan while your opponent ${opponentAction}. ${playerExpression} Your technique is a thing of beauty! ${opponentExpression} ${injuryResult}`,
-          `IQ boxing at its finest! You stay two steps ahead as your opponent ${opponentAction} but you've already moved to safety! ${playerExpression} ${opponentExpression} ${injuryResult}`,
-          `Beautiful setup! The chess match continues as your opponent ${opponentAction}, but you capitalize with surgical precision! ${playerExpression} ${opponentExpression} ${injuryResult}`,
-          `Pure boxing artistry! Your opponent ${opponentAction} but you're controlling distance and timing like a master craftsman! ${playerExpression} ${opponentExpression} ${injuryResult}`
+          `🎯 SURGICAL PERFECTION! You dissect him like a master butcher! ${playerExpression} Your opponent ${opponentAction} but you've already executed your plan to PERFECTION! ${opponentExpression} ${crowdReaction} Pure boxing POETRY written in blood! ${injuryResult}`,
+          `🧠 CHESS GRANDMASTER! You're playing 4D chess while he's playing checkers! ${playerExpression} He ${opponentAction} but you saw this coming three moves ago! ${opponentExpression} ${crowdReaction} Intellectual DOMINATION! ${injuryResult}`,
+          `🎨 VIOLENT ART! Your technique is Michelangelo painting with blood! ${playerExpression} Your opponent ${opponentAction} but you counter with GENIUS precision! ${opponentExpression} ${crowdReaction} This is BOXING POETRY! ${injuryResult}`,
+          `⚡ CALCULATED DESTRUCTION! Every movement planned, every punch measured! ${playerExpression} Your opponent ${opponentAction} but walks into your TRAP! ${opponentExpression} ${crowdReaction} Scientific BRUTALITY! ${injuryResult}`
         ],
         defensive: [
-          `SUPERB defense! Your opponent ${opponentAction} but you make him miss completely and counter with authority! He's hitting nothing but air!`,
-          `Defensive masterclass! Your opponent ${opponentAction} with bad intentions but you slip it like a ghost and land your own shot!`,
-          `Elusive as smoke! Your opponent ${opponentAction} desperately but you're gone and back with interest! He can't touch you!`,
-          `Matrix-like movement! Your opponent ${opponentAction} but you see it coming from a mile away and punish him for it!`
+          `👻 PHANTOM MODE! You slip like smoke through his desperate attempts! Your opponent ${opponentAction} but hits NOTHING but air! ${crowdReaction} He's swinging at ghosts! You counter with VENGEANCE!`,
+          `🌪️ MATRIX DEFENSE! Time slows as you see everything in slow motion! Your opponent ${opponentAction} with murderous intent but you're GONE! ${crowdReaction} Untouchable and DEADLY!`,
+          `💨 SMOKE AND MIRRORS! Your opponent ${opponentAction} desperately but you've vanished like a magician! ${crowdReaction} He's fighting his own shadow while you PUNISH him!`,
+          `🛡️ FORTRESS OF STEEL! Your opponent ${opponentAction} with everything he's got but NOTHING gets through! ${crowdReaction} Impenetrable defense meets DEVASTATING counter!`
         ],
         risky: [
-          `HOLY SMOKES! Your all-or-nothing gamble pays off HUGE! Your opponent ${opponentAction} right into your trap! The arena has ERUPTED!`,
-          `UNBELIEVABLE! High risk, massive reward! Your opponent ${opponentAction} but walks straight into your haymaker! This place is going CRAZY!`,
-          `WHAT A MOMENT! Your desperate attempt lands perfectly as your opponent ${opponentAction}! Sometimes you gotta risk it all!`,
-          `SPECTACULAR! Your opponent ${opponentAction} but your wild swing finds the sweet spot! Fortune favors the bold!`
+          `🎰 JACKPOT! Your desperate gamble pays off like hitting the lottery in HELL! ${crowdReaction} Your opponent ${opponentAction} right into your DOOMSDAY weapon! The arena has become a MADHOUSE!`,
+          `🚀 ROCKET LAUNCH! Your all-or-nothing attack EXPLODES like a nuclear warhead! Your opponent ${opponentAction} but walks into ARMAGEDDON! ${crowdReaction} This place is INSANE!`,
+          `⚡ LIGHTNING IN A BOTTLE! Your wild swing finds the sweet spot like destiny itself! Your opponent ${opponentAction} but fate had other plans! ${crowdReaction} Sometimes the gods smile upon the BOLD!`,
+          `🌪️ TORNADO OF DESTRUCTION! Your opponent ${opponentAction} but your hurricane punch OBLITERATES everything! ${crowdReaction} When you risk it all, the universe DELIVERS!`
         ]
       };
       return successResults[choice.type][Math.floor(Math.random() * successResults[choice.type].length)];
     } else {
       const failureResults = {
         aggressive: [
-          `WHIFF! Your haymaker finds nothing but air! Your opponent sees it coming and ${opponentAction} landing flush! You're in trouble now!`,
-          `TOO WILD! Your aggressive attack leaves you wide open and your opponent ${opponentAction} punishing your recklessness! That's gonna cost you!`,
-          `MISSED OPPORTUNITY! Your power shot goes nowhere and your opponent ${opponentAction} making you pay dearly! He's taking control!`,
-          `OVERCOMMITTED! You throw everything behind that shot but miss completely! Your opponent ${opponentAction} and now you're on the back foot!`
+          `💔 CATASTROPHIC WHIFF! Your haymaker cuts through empty air like a sword through mist! Your opponent sees it coming from Mars and ${opponentAction} with DEVASTATING precision! ${crowdReaction} You're in the DANGER ZONE now!`,
+          `⚰️ FATAL ERROR! Your wild aggression leaves you naked and exposed! Your opponent ${opponentAction} like a predator sensing blood! ${crowdReaction} Your recklessness will be your DOWNFALL!`,
+          `🚨 CODE RED! Your power shot finds nothing but atmosphere! Your opponent ${opponentAction} making you pay the ULTIMATE price! ${crowdReaction} He's taking COMPLETE control!`,
+          `💀 DEATH SENTENCE! You throw everything behind that shot and hit NOTHING! Your opponent ${opponentAction} and you're now dancing with DEATH! ${crowdReaction} One mistake could END everything!`
         ],
         tactical: [
-          `OUTSMARTED! Your opponent reads you like a book and ${opponentAction} disrupting your entire game plan! He's one step ahead!`,
-          `COUNTERED! Your technical approach gets shut down as your opponent ${opponentAction} and beats you to the punch! He saw that coming!`,
-          `NEUTRALIZED! Your opponent has your number and ${opponentAction} turning your own plan against you! You need to switch it up!`,
-          `PREDICTED! Your opponent anticipated that perfectly and ${opponentAction} making your technique look amateur! He's in your head!`
+          `🧠 OUTSMARTED! Your opponent reads your mind like an open book and ${opponentAction} shutting down your entire EXISTENCE! ${crowdReaction} He's ten steps ahead in this deadly dance!`,
+          `💥 COUNTERED TO HELL! Your technical approach gets DEMOLISHED as your opponent ${opponentAction} beating you at your own game! ${crowdReaction} He saw that coming from yesterday!`,
+          `🎯 NEUTRALIZED! Your opponent has cracked your code and ${opponentAction} turning your strength into WEAKNESS! ${crowdReaction} Time to abandon the game plan!`,
+          `😈 PREDICTED! Your opponent anticipated that move perfectly and ${opponentAction} making you look like an AMATEUR! ${crowdReaction} He's living in your HEAD rent-free!`
         ],
         defensive: [
-          `TOO PASSIVE! Your shell defense crumbles as your opponent ${opponentAction} finding the gaps! You can't win rounds like this!`,
-          `BREAKTHROUGH! Your defense finally breaks down and your opponent ${opponentAction} getting through clean! The tide is turning!`,
-          `NOT ENOUGH! Your safety-first approach backfires as your opponent ${opponentAction} taking over the fight! You need to take risks!`,
-          `OVERWHELMED! Your opponent ${opponentAction} with relentless pressure and your defense can't hold! He's breaking you down!`
+          `💀 FORTRESS BREACHED! Your shell defense CRUMBLES like paper in a hurricane! Your opponent ${opponentAction} finding every gap! ${crowdReaction} Passive boxing won't save you from this STORM!`,
+          `🚨 BREAKTHROUGH! Your defense finally BREAKS and your opponent ${opponentAction} getting through with AUTHORITY! ${crowdReaction} The tide has turned into a TSUNAMI!`,
+          `⚰️ NOT ENOUGH! Your safety-first approach backfires SPECTACULARLY as your opponent ${opponentAction} taking complete OWNERSHIP! ${crowdReaction} Time to take DEADLY risks!`,
+          `🌪️ OVERWHELMED! Your opponent ${opponentAction} with relentless pressure that would break steel! ${crowdReaction} He's breaking you down piece by PIECE!`
         ],
         risky: [
-          `CATASTROPHIC! Your wild gamble leaves you completely exposed and your opponent ${opponentAction} making you pay the ultimate price!`,
-          `DISASTER! Your desperation move fails spectacularly as your opponent ${opponentAction} capitalizing on your mistake! This could be over!`,
-          `BACKFIRES! Your all-or-nothing attempt goes horribly wrong and your opponent ${opponentAction} putting you in serious danger!`,
-          `PUNISHED! Your reckless abandon costs you dearly as your opponent ${opponentAction} and now you're fighting for survival!`
+          `💀 APOCALYPTIC DISASTER! Your wild gamble backfires like a nuclear meltdown! Your opponent ${opponentAction} making you pay the ULTIMATE price! ${crowdReaction} This could be your FUNERAL!`,
+          `⚰️ CATASTROPHIC FAILURE! Your desperation move fails more spectacularly than the Titanic! Your opponent ${opponentAction} capitalizing on your FATAL mistake! ${crowdReaction} You're fighting for your LIFE!`,
+          `🚨 TOTAL MELTDOWN! Your all-or-nothing attempt goes wrong in EVERY possible way! Your opponent ${opponentAction} putting you in mortal DANGER! ${crowdReaction} This is a NIGHTMARE!`,
+          `💀 PUNISHED BY THE GODS! Your reckless abandon costs you EVERYTHING as your opponent ${opponentAction} and you're now in SURVIVAL mode! ${crowdReaction} The ring has become your potential GRAVE!`
         ]
       };
       return failureResults[choice.type][Math.floor(Math.random() * failureResults[choice.type].length)];
