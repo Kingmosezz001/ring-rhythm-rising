@@ -127,36 +127,45 @@ const BoxingGame = () => {
   const generateOpponent = (): Fighter => {
     if (!fighter) return {} as Fighter;
     
-    const names = ["Mike Johnson", "Carlos Ramirez", "Tommy Wilson", "Angelo Bruno", "Vladimir Petrov"];
+    const names = ["Mike Johnson", "Carlos Ramirez", "Tommy Wilson", "Angelo Bruno", "Vladimir Petrov", "Tyson Clarke", "Rocky Martinez", "Iron King", "The Destroyer", "Lightning Lopez"];
     const selectedName = names[Math.floor(Math.random() * names.length)];
     
+    // Progressive difficulty based on fighter's progression
+    const playerLevel = (fighter.wins + fighter.popularity/10 + fighter.experience/5);
+    const difficultyMultiplier = Math.min(2.5, 1 + (playerLevel / 50)); // Caps at 2.5x difficulty
+    
+    // Higher level opponents have better stats
     const baseStats = {
-      power: 60 + Math.random() * 20,
-      speed: 60 + Math.random() * 20,
-      defense: 60 + Math.random() * 20
+      power: Math.min(95, 45 + Math.random() * 25 + (difficultyMultiplier * 15)),
+      speed: Math.min(95, 45 + Math.random() * 25 + (difficultyMultiplier * 15)),
+      defense: Math.min(95, 50 + Math.random() * 20 + (difficultyMultiplier * 12)),
     };
-
+    
+    // More experienced opponents as you progress
+    const opponentWins = Math.floor(Math.random() * 8 + (difficultyMultiplier * 5));
+    const opponentLosses = Math.max(0, Math.floor(Math.random() * 2));
+    
     return {
       name: selectedName,
-      age: 20 + Math.floor(Math.random() * 15),
+      age: 22 + Math.floor(Math.random() * 12),
       division: fighter.division,
-      wins: Math.floor(Math.random() * 10),
-      losses: Math.floor(Math.random() * 3),
-      ko: Math.floor(Math.random() * 5),
-      popularity: 20 + Math.random() * 60,
+      wins: opponentWins,
+      losses: opponentLosses,
+      ko: Math.floor(opponentWins * (0.3 + Math.random() * 0.4)),
+      popularity: Math.min(90, 25 + Math.random() * 40 + (difficultyMultiplier * 10)),
       stamina: 100,
       ...baseStats,
-      technique: 40 + Math.random() * 30,
-      mental: 40 + Math.random() * 30,
-      experience: Math.floor(Math.random() * 50),
+      technique: Math.min(90, 35 + Math.random() * 30 + (difficultyMultiplier * 15)),
+      mental: Math.min(90, 35 + Math.random() * 30 + (difficultyMultiplier * 15)),
+      experience: Math.min(95, Math.floor(Math.random() * 30 + (difficultyMultiplier * 20))),
       injuries: [],
       facialDamage: 0,
-      money: 10000,
+      money: 15000 + Math.floor(difficultyMultiplier * 10000),
       energy: 100,
       weeksSinceLastFight: 0,
-      unrankedWins: Math.floor(Math.random() * 3),
+      unrankedWins: Math.floor(Math.random() * 2 + difficultyMultiplier),
       socialMedia: {
-        followers: Math.floor(Math.random() * 1000),
+        followers: Math.floor(Math.random() * 800 + (difficultyMultiplier * 500)),
         totalPosts: 0,
         totalLikes: 0,
         totalComments: 0,
@@ -239,11 +248,32 @@ const BoxingGame = () => {
     if (!currentFight || !fighter) return;
 
     const newStamina = Math.max(0, fighter.stamina - choice.staminaCost);
-    const success = Math.random() < choice.successChance;
+    
+    // Calculate success with much more challenging odds
+    const playerLevel = (fighter.wins + fighter.experience/10);
+    const opponentLevel = (currentFight.opponent.wins + currentFight.opponent.experience/10);
+    const levelDifference = opponentLevel - playerLevel;
+    
+    // Base success chance heavily influenced by opponent strength
+    let adjustedSuccessChance = choice.successChance * 0.6; // Reduce base success by 40%
+    
+    // Factor in level difference (negative = opponent is stronger)
+    adjustedSuccessChance *= Math.max(0.3, 1 - (levelDifference * 0.08)); // Up to 70% reduction for stronger opponents
+    
+    // Stamina effect is more punishing
+    const staminaFactor = Math.max(0.4, fighter.stamina / 100);
+    adjustedSuccessChance *= staminaFactor;
+    
+    // Round progression makes it harder
+    const roundPenalty = 1 - (currentFight.round * 0.03); // 3% harder each round
+    adjustedSuccessChance *= roundPenalty;
+    
+    const success = Math.random() < Math.max(0.15, adjustedSuccessChance); // Minimum 15% chance
     const points = success ? (choice.type === "risky" ? 3 : choice.type === "aggressive" ? 2 : 1) : 0;
     
-    // Opponent logic (simplified)
-    const opponentPoints = Math.random() < 0.5 ? 1 : 0;
+    // Opponent is much more likely to score, especially against weaker fighters
+    const opponentSuccessChance = Math.min(0.75, 0.4 + (levelDifference * 0.08));
+    const opponentPoints = Math.random() < opponentSuccessChance ? (Math.random() < 0.3 ? 2 : 1) : 0;
     
     setFighter(prev => prev ? ({ ...prev, stamina: newStamina }) : null);
     
