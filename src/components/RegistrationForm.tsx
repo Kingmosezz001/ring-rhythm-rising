@@ -19,18 +19,8 @@ const RegistrationForm = ({ onCreateFighter }: RegistrationFormProps) => {
   const divisions = ["Lightweight", "Welterweight", "Middleweight", "Light Heavyweight", "Heavyweight"];
 
   const getStatsForStyle = (style: string) => {
-    switch (style) {
-      case "brawler":
-        return { power: 75, speed: 60, defense: 55 };
-      case "boxer":
-        return { power: 60, speed: 75, defense: 65 };
-      case "slugger":
-        return { power: 80, speed: 50, defense: 60 };
-      case "counterpuncher":
-        return { power: 65, speed: 70, defense: 75 };
-      default: // balanced
-        return { power: 65, speed: 70, defense: 60 };
-    }
+    // All attributes start at 50 base
+    return { power: 50, speed: 50, defense: 50 };
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -46,7 +36,7 @@ const RegistrationForm = ({ onCreateFighter }: RegistrationFormProps) => {
       losses: 0,
       ko: 0,
       popularity: 10,
-      stamina: 100,
+      stamina: 50,
       ...stats,
       technique: 50,
       mental: 50,

@@ -64,78 +64,71 @@ const ManagerInterface = ({ fighter, onBack, manager, offers }: ManagerInterface
           </div>
         </Card>
 
-        {/* Current Advice */}
-        <Card className="p-4 bg-card border-boxing-gold">
-          <div className="flex items-start gap-3">
-            <MessageCircle className="h-5 w-5 text-boxing-gold mt-1" />
-            <div>
-              <h3 className="text-sm font-bold text-boxing-gold mb-2">Current Advice</h3>
-              <p className="text-sm text-muted-foreground">{getCurrentAdvice()}</p>
-            </div>
-          </div>
-        </Card>
-
-        {/* Fight Offers */}
-        <Card className="p-4 bg-card border-boxing-red">
-          <h3 className="text-sm font-bold text-boxing-gold mb-3 flex items-center gap-2">
-            <Briefcase className="h-4 w-4" />
-            Fight Offers & Opportunities
-          </h3>
-          <div className="space-y-3">
-            <div className="p-3 bg-muted rounded border-l-4 border-green-500">
-              <p className="text-xs font-semibold text-green-600">Upcoming Opportunity</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                "There's a local tournament coming up next month. Prize money is $50,000 and good exposure. 
-                I think you're ready for this level of competition."
-              </p>
-            </div>
-            
-            <div className="p-3 bg-muted rounded border-l-4 border-blue-500">
-              <p className="text-xs font-semibold text-blue-600">Media Interest</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                "Boxing Weekly wants to do a feature on up-and-coming fighters. This could be great for your image if we time it right."
-              </p>
-            </div>
-
-            {offers.map((offer, index) => (
-              <div key={index} className="p-3 bg-muted rounded border-l-4 border-boxing-gold">
-                <p className="text-xs font-semibold text-boxing-gold">{offer.type}</p>
-                <p className="text-xs text-muted-foreground mt-1">{offer.message}</p>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Fighter Analysis */}
-        <Card className="p-4 bg-card border-boxing-red">
-          <h3 className="text-sm font-bold text-boxing-gold mb-3 flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Performance Analysis
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="text-xs font-semibold text-boxing-gold mb-2">Strengths</h4>
+        {/* Organized Advice Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {/* Current Advice */}
+          <Card className="p-3 bg-card border-boxing-gold">
+            <div className="flex items-start gap-2">
+              <MessageCircle className="h-3 w-3 text-boxing-gold mt-1 flex-shrink-0" />
               <div className="space-y-1">
-                {fighter.power > 70 && <p className="text-xs text-green-600">• Exceptional punching power</p>}
-                {fighter.speed > 70 && <p className="text-xs text-green-600">• Lightning fast hands</p>}
-                {fighter.defense > 70 && <p className="text-xs text-green-600">• Solid defensive skills</p>}
-                {fighter.technique > 70 && <p className="text-xs text-green-600">• Technical precision</p>}
-                {fighter.mental > 70 && <p className="text-xs text-green-600">• Strong mental game</p>}
+                <h3 className="text-xs font-bold text-boxing-gold">Strategic Advice</h3>
+                <p className="text-[10px] text-muted-foreground leading-tight">{getCurrentAdvice()}</p>
               </div>
             </div>
-            
-            <div>
-              <h4 className="text-xs font-semibold text-boxing-gold mb-2">Areas to Improve</h4>
+          </Card>
+
+          {/* Fight Offers */}
+          <Card className="p-3 bg-card border-boxing-red">
+            <div className="flex items-start gap-2">
+              <Briefcase className="h-3 w-3 text-boxing-red mt-1 flex-shrink-0" />
               <div className="space-y-1">
-                {fighter.power < 60 && <p className="text-xs text-red-600">• Work on power development</p>}
-                {fighter.speed < 60 && <p className="text-xs text-red-600">• Improve hand speed</p>}
-                {fighter.defense < 60 && <p className="text-xs text-red-600">• Strengthen defense</p>}
-                {fighter.technique < 60 && <p className="text-xs text-red-600">• Focus on technique</p>}
-                {fighter.mental < 60 && <p className="text-xs text-red-600">• Mental training needed</p>}
+                <h3 className="text-xs font-bold text-boxing-gold">Opportunities</h3>
+                <div className="space-y-1">
+                  <div className="p-2 bg-muted rounded border-l-2 border-green-500">
+                    <p className="text-[9px] font-medium text-green-600">Tournament</p>
+                    <p className="text-[8px] text-muted-foreground">Local event, $50K prize</p>
+                  </div>
+                  <div className="p-2 bg-muted rounded border-l-2 border-blue-500">
+                    <p className="text-[9px] font-medium text-blue-600">Media</p>
+                    <p className="text-[8px] text-muted-foreground">Boxing Weekly feature</p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </Card>
+          </Card>
+
+          {/* Performance Analysis */}
+          <Card className="p-3 bg-card border-boxing-red">
+            <div className="flex items-start gap-2">
+              <TrendingUp className="h-3 w-3 text-boxing-gold mt-1 flex-shrink-0" />
+              <div className="space-y-1">
+                <h3 className="text-xs font-bold text-boxing-gold">Analysis</h3>
+                <div className="space-y-1">
+                  <div className="space-y-0.5">
+                    <h4 className="text-[9px] font-medium text-green-600">Strengths</h4>
+                    <div className="space-y-0.5">
+                      {fighter.power > 70 && <p className="text-[8px] text-green-600">• Power</p>}
+                      {fighter.speed > 70 && <p className="text-[8px] text-green-600">• Speed</p>}
+                      {fighter.defense > 70 && <p className="text-[8px] text-green-600">• Defense</p>}
+                      {fighter.technique > 70 && <p className="text-[8px] text-green-600">• Technique</p>}
+                      {fighter.mental > 70 && <p className="text-[8px] text-green-600">• Mental</p>}
+                    </div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <h4 className="text-[9px] font-medium text-red-600">Improve</h4>
+                    <div className="space-y-0.5">
+                      {fighter.power < 60 && <p className="text-[8px] text-red-600">• Power</p>}
+                      {fighter.speed < 60 && <p className="text-[8px] text-red-600">• Speed</p>}
+                      {fighter.defense < 60 && <p className="text-[8px] text-red-600">• Defense</p>}
+                      {fighter.technique < 60 && <p className="text-[8px] text-red-600">• Technique</p>}
+                      {fighter.mental < 60 && <p className="text-[8px] text-red-600">• Mental</p>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );

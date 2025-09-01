@@ -148,7 +148,7 @@ const BoxingGame = () => {
     return {
       name: selectedName,
       age: 22 + Math.floor(Math.random() * 12),
-      division: fighter.division,
+      division: fighter.division, // Same weight class
       wins: opponentWins,
       losses: opponentLosses,
       ko: Math.floor(opponentWins * (0.3 + Math.random() * 0.4)),
@@ -347,10 +347,32 @@ const BoxingGame = () => {
     }) : null);
   };
 
+  const calculateFightEarnings = (won: boolean, opponent: Fighter): number => {
+    if (!fighter) return 0;
+    
+    // Base purse calculation - more realistic amounts
+    const basePurse = Math.max(5000, Math.min(2000000, // $5k minimum, $2M maximum
+      10000 * Math.pow(1.5, fighter.wins) + // Exponential growth with wins
+      (opponent.wins * 8000) + // Opponent quality bonus
+      (fighter.popularity * 1000) + // Popularity bonus
+      (opponent.popularity * 500) // Opponent popularity bonus
+    ));
+    
+    // Win bonus (typically 50-100% of base purse for wins)
+    const winBonus = won ? basePurse * (0.5 + Math.random() * 0.5) : 0;
+    
+    // Performance bonus for dominant wins
+    const performanceBonus = won && currentFight ? 
+      (currentFight.playerScore > currentFight.opponentScore * 2 ? basePurse * 0.25 : 0) : 0;
+    
+    return Math.floor(basePurse + winBonus + performanceBonus);
+  };
+
   const endFight = (won: boolean) => {
     if (!fighter || !currentFight) return;
     
     const endCommentary = generateEndFightCommentary(won, currentFight.opponent);
+    const earnings = calculateFightEarnings(won, currentFight.opponent);
     
     if (won) {
       const experienceGain = Math.max(5, 10 - Math.floor(fighter.wins / 5)); // Diminishing experience
@@ -365,8 +387,9 @@ const BoxingGame = () => {
         unrankedWins: isUnrankedOpponent ? prev.unrankedWins + 1 : prev.unrankedWins,
         experience: prev.experience + experienceGain,
         popularity: Math.min(100, prev.popularity + popularityGain),
+        money: prev.money + earnings,
         stamina: 100,
-        weeksSinceLastFight: Math.floor(Math.random() * 4) // 0-3 weeks, need 4-7 total
+        weeksSinceLastFight: 0 // Reset countdown after fight
       }) : null);
       
       // Update social media based on fight result
@@ -374,15 +397,19 @@ const BoxingGame = () => {
       
       toast({
         title: "VICTORY!",
-        description: endCommentary,
+        description: `${endCommentary} Earnings: $${earnings.toLocaleString()}`,
       });
     } else {
+      // Still get paid for losing (usually 50-80% of base purse)
+      const loserPurse = Math.floor(earnings * 0.3); // 30% of what winner would get
+      
       setFighter(prev => prev ? ({
         ...prev,
         losses: prev.losses + 1,
         experience: prev.experience + 2, // Less experience from losses
+        money: prev.money + loserPurse,
         stamina: 100,
-        weeksSinceLastFight: Math.floor(Math.random() * 4) // 0-3 weeks, need 4-7 total
+        weeksSinceLastFight: 0 // Reset countdown after fight
       }) : null);
       
       // Update social media based on fight result
@@ -398,7 +425,7 @@ const BoxingGame = () => {
       
       toast({
         title: "DEFEAT",
-        description: endCommentary,
+        description: `${endCommentary} Earnings: $${loserPurse.toLocaleString()}`,
         variant: "destructive"
       });
     }
