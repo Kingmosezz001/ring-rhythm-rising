@@ -135,9 +135,9 @@ const TrainingInterface = ({ fighter, onTrainStat, onBack }: TrainingInterfacePr
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
                       <span>Level</span>
-                      <span>{option.currentValue}</span>
+                      <span>{Math.floor(option.currentValue)}</span>
                     </div>
-                    <Progress value={option.currentValue} className="h-1" />
+                    <Progress value={Math.floor(option.currentValue)} className="h-1" />
                     
                     {isMaxed ? (
                       <Badge variant="secondary" className="w-full justify-center text-xs">
