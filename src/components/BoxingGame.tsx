@@ -72,6 +72,54 @@ const BoxingGame = () => {
   const [managerOffers, setManagerOffers] = useState<{type: string, message: string, id: string}[]>([]);
   const [crowdReactions, setCrowdReactions] = useState<string[]>([]);
 
+  const saveGame = () => {
+    if (!fighter) return;
+    
+    const gameData = {
+      fighter,
+      currentWeek,
+      wonBelts,
+      managerOffers,
+      gameState: "career"
+    };
+    
+    localStorage.setItem("boxingGameSave", JSON.stringify(gameData));
+    toast({
+      title: "Game Saved",
+      description: "Your progress has been saved successfully!",
+    });
+  };
+
+  const loadGame = () => {
+    const savedData = localStorage.getItem("boxingGameSave");
+    if (savedData) {
+      try {
+        const gameData = JSON.parse(savedData);
+        setFighter(gameData.fighter);
+        setCurrentWeek(gameData.currentWeek);
+        setWonBelts(gameData.wonBelts || []);
+        setManagerOffers(gameData.managerOffers || []);
+        setGameState("career");
+        toast({
+          title: "Game Loaded",
+          description: "Your saved progress has been loaded!",
+        });
+      } catch (error) {
+        toast({
+          title: "Load Failed",
+          description: "Could not load saved game data.",
+          variant: "destructive"
+        });
+      }
+    } else {
+      toast({
+        title: "No Save Found",
+        description: "No saved game data found.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const [manager] = useState<Manager>({
     name: "Tony Martinez",
     reputation: 75,
@@ -445,8 +493,8 @@ const BoxingGame = () => {
       return;
     }
     
-    // Much slower progression - 0.5-1.5 points with heavy diminishing returns
-    const baseImprovement = 0.5 + Math.random();
+    // Much slower progression - 0.1-0.3 points with heavy diminishing returns
+    const baseImprovement = 0.1 + Math.random() * 0.2;
     const currentStat = stat === "power" ? fighter.power : 
                        stat === "speed" ? fighter.speed :
                        stat === "defense" ? fighter.defense :
@@ -455,11 +503,11 @@ const BoxingGame = () => {
                        stat === "mental" ? fighter.mental : 50;
     
     // Heavy diminishing returns - much harder to improve when stats are high
-    const difficultyModifier = currentStat > 90 ? 0.1 : 
-                              currentStat > 80 ? 0.3 : 
-                              currentStat > 70 ? 0.5 : 
-                              currentStat > 60 ? 0.7 : 1;
-    const improvement = Math.max(0.1, baseImprovement * difficultyModifier);
+    const difficultyModifier = currentStat > 90 ? 0.05 : 
+                              currentStat > 80 ? 0.15 : 
+                              currentStat > 70 ? 0.3 : 
+                              currentStat > 60 ? 0.5 : 0.8;
+    const improvement = Math.max(0.05, baseImprovement * difficultyModifier);
     
     setFighter(prev => {
       if (!prev) return null;
@@ -493,10 +541,22 @@ const BoxingGame = () => {
       return { ...prev, ...updates };
     });
     
-    toast({
-      title: "Training Complete",
-      description: `${stat.charAt(0).toUpperCase() + stat.slice(1)} improved by ${improvement.toFixed(1)} points! Energy decreased.`,
-    });
+    // Only show improvement when reaching next whole number
+    const oldWholeStat = Math.floor(currentStat);
+    const newStat = Math.min(100, currentStat + improvement);
+    const newWholeStat = Math.floor(newStat);
+    
+    if (newWholeStat > oldWholeStat) {
+      toast({
+        title: "Training Complete",
+        description: `${stat.charAt(0).toUpperCase() + stat.slice(1)} increased to ${newWholeStat}! Energy decreased.`,
+      });
+    } else {
+      toast({
+        title: "Training Complete",
+        description: `Training session completed. Energy decreased.`,
+      });
+    }
   };
 
   const advanceWeek = () => {
@@ -589,12 +649,22 @@ const BoxingGame = () => {
               >
                 START CAREER
               </Button>
-              <Button 
-                variant="outline" 
-                className="w-full border-boxing-red text-boxing-red hover:bg-boxing-red/10"
-              >
-                LOAD SAVE
-              </Button>
+              <div className="grid grid-cols-2 gap-4">
+                <Button 
+                  variant="outline" 
+                  className="border-boxing-red text-boxing-red hover:bg-boxing-red/10"
+                  onClick={saveGame}
+                >
+                  SAVE GAME
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="border-boxing-gold text-boxing-gold hover:bg-boxing-gold/10"
+                  onClick={loadGame}
+                >
+                  LOAD GAME
+                </Button>
+              </div>
             </div>
           </div>
         </Card>
@@ -833,34 +903,34 @@ const BoxingGame = () => {
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             <div className="text-center">
-              <div className="text-lg font-bold text-boxing-gold">{fighter.power}</div>
+              <div className="text-lg font-bold text-boxing-gold">{Math.floor(fighter.power)}</div>
               <div className="text-xs text-muted-foreground">Power</div>
-              <Progress value={fighter.power} className="h-1 mt-1" />
+              <Progress value={Math.floor(fighter.power)} className="h-1 mt-1" />
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-boxing-gold">{fighter.speed}</div>
+              <div className="text-lg font-bold text-boxing-gold">{Math.floor(fighter.speed)}</div>
               <div className="text-xs text-muted-foreground">Speed</div>
-              <Progress value={fighter.speed} className="h-1 mt-1" />
+              <Progress value={Math.floor(fighter.speed)} className="h-1 mt-1" />
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-boxing-gold">{fighter.defense}</div>
+              <div className="text-lg font-bold text-boxing-gold">{Math.floor(fighter.defense)}</div>
               <div className="text-xs text-muted-foreground">Defense</div>
-              <Progress value={fighter.defense} className="h-1 mt-1" />
+              <Progress value={Math.floor(fighter.defense)} className="h-1 mt-1" />
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-boxing-gold">{fighter.stamina}</div>
+              <div className="text-lg font-bold text-boxing-gold">{Math.floor(fighter.stamina)}</div>
               <div className="text-xs text-muted-foreground">Stamina</div>
-              <Progress value={fighter.stamina} className="h-1 mt-1" />
+              <Progress value={Math.floor(fighter.stamina)} className="h-1 mt-1" />
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-boxing-gold">{fighter.technique}</div>
+              <div className="text-lg font-bold text-boxing-gold">{Math.floor(fighter.technique)}</div>
               <div className="text-xs text-muted-foreground">Technique</div>
-              <Progress value={fighter.technique} className="h-1 mt-1" />
+              <Progress value={Math.floor(fighter.technique)} className="h-1 mt-1" />
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold text-boxing-gold">{fighter.mental}</div>
+              <div className="text-lg font-bold text-boxing-gold">{Math.floor(fighter.mental)}</div>
               <div className="text-xs text-muted-foreground">Mental</div>
-              <Progress value={fighter.mental} className="h-1 mt-1" />
+              <Progress value={Math.floor(fighter.mental)} className="h-1 mt-1" />
             </div>
           </div>
 
