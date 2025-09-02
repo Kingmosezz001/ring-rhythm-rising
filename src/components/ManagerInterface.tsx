@@ -70,9 +70,9 @@ const ManagerInterface = ({ fighter, onBack, manager, offers }: ManagerInterface
           <Card className="p-3 bg-card border-boxing-gold">
             <div className="flex items-start gap-2">
               <MessageCircle className="h-3 w-3 text-boxing-gold mt-1 flex-shrink-0" />
-              <div className="space-y-1">
-                <h3 className="text-xs font-bold text-boxing-gold">Strategic Advice</h3>
-                <p className="text-[10px] text-muted-foreground leading-tight">{getCurrentAdvice()}</p>
+               <div className="space-y-1">
+                <h3 className="text-[8px] font-bold text-boxing-gold">Strategic Advice</h3>
+                <p className="text-[6px] text-muted-foreground leading-tight">{getCurrentAdvice()}</p>
               </div>
             </div>
           </Card>
