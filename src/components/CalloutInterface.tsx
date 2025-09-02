@@ -180,13 +180,49 @@ const CalloutInterface = ({ fighter, onBack, onStartFight }: CalloutInterfacePro
             </p>
           </Card>
 
-          {/* Current Callouts */}
-          <Card className="p-2 bg-card border-boxing-red mt-2">
-            <h3 className="text-xs font-bold text-boxing-gold mb-1">Fighters Calling You Out</h3>
-            <div className="space-y-1">
-              <div className="p-1 bg-muted rounded">
-                <p className="text-xs font-semibold">Jake "The Snake" Williams</p>
-                <p className="text-xs text-muted-foreground">"That bum thinks he's ready for real competition? I'll show him what a real fighter looks like!"</p>
+          {/* Current Callouts - Enhanced with Response Options */}
+          <Card className="p-3 bg-card border-boxing-red mt-2">
+            <h3 className="text-sm font-bold text-boxing-gold mb-2">Fighters Calling You Out</h3>
+            <div className="space-y-2">
+              <div className="p-2 bg-muted rounded border-l-4 border-red-500">
+                <p className="text-sm font-semibold text-boxing-gold">Jake "The Snake" Williams</p>
+                <p className="text-xs text-muted-foreground mb-2">"That bum thinks he's ready for real competition? I'll show him what a real fighter looks like!"</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button 
+                    size="sm" 
+                    className="bg-red-600 hover:bg-red-700 text-xs"
+                    onClick={() => toast({
+                      title: "Fired Back!",
+                      description: "You responded: 'Keep talking while you can, because you won't be able to after I'm done with you!'"
+                    })}
+                  >
+                    Fire Back
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="border-green-500 text-green-500 hover:bg-green-500/10 text-xs"
+                    onClick={() => {
+                      const opponent = generateOpponentFromReal({
+                        name: "Jake Williams", wins: 15, losses: 2, ko: 8, popularity: 65, difficulty: "Contender"
+                      });
+                      onStartFight(opponent);
+                    }}
+                  >
+                    Accept Fight
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="text-xs"
+                    onClick={() => toast({
+                      title: "Ignored",
+                      description: "You chose to ignore the callout. Sometimes silence speaks louder than words."
+                    })}
+                  >
+                    Ignore
+                  </Button>
+                </div>
               </div>
             </div>
           </Card>

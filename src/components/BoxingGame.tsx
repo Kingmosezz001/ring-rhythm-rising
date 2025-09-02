@@ -297,31 +297,36 @@ const BoxingGame = () => {
 
     const newStamina = Math.max(0, fighter.stamina - choice.staminaCost);
     
-    // Calculate success with much more challenging odds
-    const playerLevel = (fighter.wins + fighter.experience/10);
+    // Calculate success with extremely challenging odds
+    const playerLevel = (fighter.wins + fighter.experience/15);
     const opponentLevel = (currentFight.opponent.wins + currentFight.opponent.experience/10);
     const levelDifference = opponentLevel - playerLevel;
     
-    // Base success chance heavily influenced by opponent strength
-    let adjustedSuccessChance = choice.successChance * 0.6; // Reduce base success by 40%
+    // Base success chance heavily reduced - much harder fights
+    let adjustedSuccessChance = choice.successChance * 0.4; // Reduce base success by 60%
     
-    // Factor in level difference (negative = opponent is stronger)
-    adjustedSuccessChance *= Math.max(0.3, 1 - (levelDifference * 0.08)); // Up to 70% reduction for stronger opponents
+    // Factor in level difference (negative = opponent is stronger) - more punishing
+    adjustedSuccessChance *= Math.max(0.2, 1 - (levelDifference * 0.12)); // Up to 80% reduction for stronger opponents
     
-    // Stamina effect is more punishing
-    const staminaFactor = Math.max(0.4, fighter.stamina / 100);
+    // Stamina effect is extremely punishing
+    const staminaFactor = Math.max(0.3, fighter.stamina / 100);
     adjustedSuccessChance *= staminaFactor;
     
-    // Round progression makes it harder
-    const roundPenalty = 1 - (currentFight.round * 0.03); // 3% harder each round
+    // Round progression makes it much harder
+    const roundPenalty = 1 - (currentFight.round * 0.05); // 5% harder each round
     adjustedSuccessChance *= roundPenalty;
     
-    const success = Math.random() < Math.max(0.15, adjustedSuccessChance); // Minimum 15% chance
+    // Additional difficulty based on opponent quality
+    const opponentQuality = (currentFight.opponent.power + currentFight.opponent.speed + currentFight.opponent.defense) / 300;
+    adjustedSuccessChance *= Math.max(0.4, 1.2 - opponentQuality); // High-stat opponents are much harder
+    
+    const success = Math.random() < Math.max(0.1, adjustedSuccessChance); // Minimum 10% chance
     const points = success ? (choice.type === "risky" ? 3 : choice.type === "aggressive" ? 2 : 1) : 0;
     
-    // Opponent is much more likely to score, especially against weaker fighters
-    const opponentSuccessChance = Math.min(0.75, 0.4 + (levelDifference * 0.08));
-    const opponentPoints = Math.random() < opponentSuccessChance ? (Math.random() < 0.3 ? 2 : 1) : 0;
+    // Opponent is much more likely to score and score bigger
+    const opponentSuccessChance = Math.min(0.85, 0.5 + (levelDifference * 0.12) + (opponentQuality * 0.2));
+    const opponentPoints = Math.random() < opponentSuccessChance ? 
+      (Math.random() < 0.4 ? 3 : Math.random() < 0.6 ? 2 : 1) : 0;
     
     setFighter(prev => prev ? ({ ...prev, stamina: newStamina }) : null);
     
@@ -934,52 +939,62 @@ const BoxingGame = () => {
             </div>
           </div>
 
-          {/* Manager Advice */}
-          <Card className="p-3 bg-card border-boxing-red">
-            <div className="flex items-center gap-2 mb-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg" alt={manager.name} />
-                <AvatarFallback className="bg-muted text-xs">
-                  {manager.name.split(' ').map(n => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="text-sm font-bold text-boxing-gold">{manager.name}</h3>
-                <p className="text-xs text-muted-foreground">Manager</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            <Button
+              onClick={() => setGameState("training")}
+              variant="outline"
+              className="bg-muted border-boxing-gold text-boxing-gold hover:bg-boxing-gold/10 p-4 h-auto"
+            >
+              <div className="flex flex-col items-center gap-1">
+                <Dumbbell className="h-5 w-5" />
+                <span className="text-xs">Training</span>
               </div>
-            </div>
-            <div className="bg-muted p-2 rounded-lg">
-              <p className="italic text-xs">"{manager.advice[Math.floor(Math.random() * manager.advice.length)]}"</p>
-            </div>
-          </Card>
-
-          {/* Fighter Money & Status */}
-          <Card className="p-3 bg-card border-boxing-red">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <div className="text-center">
-                  <p className="text-lg font-bold text-boxing-gold">${fighter.money.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">Earnings</p>
-                </div>
-                {fighter.injuries.length > 0 && (
-                  <div className="text-center">
-                    <Badge variant="destructive" className="mb-1 text-xs">
-                      {fighter.injuries.length} Injuries
-                    </Badge>
-                    <p className="text-xs text-muted-foreground">{fighter.injuries[0]}</p>
-                  </div>
-                )}
-                {fighter.facialDamage > 0 && (
-                  <div className="text-center">
-                    <Badge variant="secondary" className="mb-1 text-xs">
-                      Facial Damage
-                    </Badge>
-                    <Progress value={fighter.facialDamage} className="h-1 w-12" />
-                  </div>
-                )}
+            </Button>
+            
+            <Button
+              onClick={() => setGameState("callout")}
+              variant="outline"
+              className="bg-muted border-boxing-red text-boxing-red hover:bg-boxing-red/10 p-4 h-auto"
+            >
+              <div className="flex flex-col items-center gap-1">
+                <Sword className="h-5 w-5" />
+                <span className="text-xs">Call Out</span>
               </div>
-            </div>
-          </Card>
+            </Button>
+            
+            <Button
+              onClick={saveGame}
+              variant="outline"
+              className="bg-muted border-boxing-gold text-boxing-gold hover:bg-boxing-gold/10 p-4 h-auto"
+            >
+              <div className="flex flex-col items-center gap-1">
+                <Shield className="h-5 w-5" />
+                <span className="text-xs">Save Game</span>
+              </div>
+            </Button>
+            
+            <Button
+              onClick={() => {
+                localStorage.removeItem("boxingGameSave");
+                setFighter(null);
+                setCurrentWeek(1);
+                setWonBelts([]);
+                setManagerOffers([]);
+                setGameState("registration");
+                toast({
+                  title: "Game Reset",
+                  description: "All progress has been reset. Starting fresh!",
+                });
+              }}
+              variant="outline"
+              className="bg-muted border-red-500 text-red-500 hover:bg-red-500/10 p-4 h-auto"
+            >
+              <div className="flex flex-col items-center gap-1">
+                <TrendingUp className="h-5 w-5" />
+                <span className="text-xs">Reset Game</span>
+              </div>
+            </Button>
+          </div>
 
       {/* Career Actions - Horizontal Scroll */}
         <Card className="p-3 bg-card border-boxing-red">
